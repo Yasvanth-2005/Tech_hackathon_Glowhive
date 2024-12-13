@@ -101,6 +101,12 @@ export const updateComplaint = async (req, res) => {
 };
 
 export const getAllComplaints = async (req, res) => {
+  if (role !== "HOD" || role !== "DSW" || role !== "AO" || role !== "Warden") {
+    return res
+      .status(404)
+      .json({ message: "You are not allowed to see this data" });
+  }
+
   try {
     const complaints = await Complaints.find();
 
@@ -116,6 +122,12 @@ export const getAllComplaints = async (req, res) => {
 };
 
 export const getAOComplaints = async (req, res) => {
+  if (role !== "HOD" || role !== "DSW" || role !== "AO") {
+    return res
+      .status(404)
+      .json({ message: "You are not allowed to see this data" });
+  }
+
   try {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -141,6 +153,12 @@ export const getAOComplaints = async (req, res) => {
 };
 
 export const getDSWComplaints = async (req, res) => {
+  if (role !== "HOD" || role !== "DSW") {
+    return res
+      .status(404)
+      .json({ message: "You are not allowed to see this data" });
+  }
+
   try {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 7);
@@ -166,7 +184,14 @@ export const getDSWComplaints = async (req, res) => {
 };
 
 export const getHODComplaints = async (req, res) => {
+  const role = req.role;
   try {
+    if (role !== "HOD") {
+      return res
+        .status(404)
+        .json({ message: "You are not allowed to see this data" });
+    }
+
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 10);
 

@@ -4,6 +4,8 @@ import {
   fetchUser,
   getAllUsers,
   getUsersById,
+  updateChecking,
+  updateProfile,
   userLogin,
   userRegister,
 } from "../controllers/user.controllers.js";
@@ -18,5 +20,7 @@ router.post("/login", userLogin);
 router.post("/register", userRegister);
 router.get("/all", adminTokenCheck, getAllUsers);
 router.get("/:id", adminTokenCheck, getUsersById);
+router.patch("/edit/:id", verifyUserToken, updateProfile);
+router.put("/checking", verifyUserToken, updateChecking);
 
 export default router;

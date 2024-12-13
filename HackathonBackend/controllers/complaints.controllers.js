@@ -1,4 +1,5 @@
 import Complaints from "../models/complaints.model.js";
+import User from "../models/user.model.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -27,6 +28,7 @@ export const sendComplaint = async (req, res) => {
         .json({ message: "File upload failed", error: err });
     }
 
+    const user = req.user;
     const {
       typeOfComplaint,
       statement,
@@ -58,6 +60,10 @@ export const sendComplaint = async (req, res) => {
       if (!complaint) {
         return res.status(404).json({ message: "Posting Complaint Failed" });
       }
+
+      await User.findByIdAndUpdate(user, {
+        $push: { complaints: complaint._id },
+      });
 
       return res.status(200).json({
         message: "New Complaint Sent Successfully",
@@ -142,7 +148,10 @@ export const getAllComplaints = async (req, res) => {
       };
     }
 
-    const complaints = await Complaints.find(filter);
+    const complaints = await Complaints.find(filter).populate(
+      "userId",
+      "email username phno collegeId"
+    );
 
     if (!complaints.length) {
       return res
@@ -164,7 +173,10 @@ export const getComplaintDetails = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const complaint = await Complaints.findById(id);
+    const complaint = await Complaints.findById(id).populate(
+      "userId",
+      "email username phno collegeId"
+    );
     if (!complaint) {
       return res.status(404).json({ message: "Message not found" });
     }

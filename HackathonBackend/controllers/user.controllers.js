@@ -6,7 +6,7 @@ export const fetchUser = async (req, res) => {
   const userId = req.user;
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("complaints");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -36,7 +36,7 @@ export const userLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("complaints");
     if (!user) {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
@@ -165,6 +165,47 @@ export const getUsersById = async (req, res) => {
     }
 
     return res.status(200).json({ users });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateChecking = async (req, res) => {
+  const userId = req.user;
+  try {
+    await User.findByIdAndUpdate(userId, { is_checked: true });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  const userId = req.user;
+  const { username } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const populatedUser = await updatedUser.populate("complaints");
+
+    const user = {
+      ...populatedUser._doc,
+      password: undefined,
+    };
+
+    return res
+      .status(200)
+      .json({ message: "Profile Updated Successfully", user });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Internal Server Error" });

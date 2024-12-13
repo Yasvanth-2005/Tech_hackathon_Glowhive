@@ -100,13 +100,95 @@ export const updateComplaint = async (req, res) => {
   }
 };
 
-export const getAllComplaints = async (req, res) => {};
+export const getAllComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaints.find();
 
-export const getAOComplaints = async (req, res) => {};
+    if (!complaints) {
+      return res.status(404).json({ message: "Complaints Not Found" });
+    }
 
-export const getDSWComplaints = async (req, res) => {};
+    return res.status(200).json({ complaints });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ messgae: "Internal Server Error" });
+  }
+};
 
-export const getHODComplaints = async (req, res) => {};
+export const getAOComplaints = async (req, res) => {
+  try {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    const complaints = await Complaints.find({
+      $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
+    });
+
+    if (complaints.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No critical or recent complaints found" });
+    }
+
+    return res.status(200).json({
+      message: "Critical or recent complaints fetched successfully",
+      complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getDSWComplaints = async (req, res) => {
+  try {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 7);
+
+    const complaints = await Complaints.find({
+      $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
+    });
+
+    if (complaints.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No critical or recent complaints found" });
+    }
+
+    return res.status(200).json({
+      message: "Critical or recent complaints fetched successfully",
+      complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getHODComplaints = async (req, res) => {
+  try {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 10);
+
+    const complaints = await Complaints.find({
+      $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
+    });
+
+    if (complaints.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No critical or recent complaints found" });
+    }
+
+    return res.status(200).json({
+      message: "Critical or recent complaints fetched successfully",
+      complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export const getComplaintDetails = async (req, res) => {};
 
@@ -114,7 +196,7 @@ export const getUserComplaintDetails = async (req, res) => {
   const userId = req.user;
 
   try {
-    const userComplaints = await Complaint.find({ userId });
+    const userComplaints = await Complaints.find({ userId });
     if (!userComplaints) {
       return res.status(404).json({ message: "User Not Found" });
     }

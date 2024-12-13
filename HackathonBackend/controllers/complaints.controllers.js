@@ -114,45 +114,49 @@ export const updateComplaint = async (req, res) => {
 };
 
 export const getAllComplaints = async (req, res) => {
-  const role = req.role;
-  if (role === "HOD" || role === "DSW" || role === "AO" || role === "Warden") {
-    try {
-      let days = 0;
-      if (role === "HOD") {
-        days = 10;
-      } else if (role === "DSW") {
-        days = 7;
-      } else if (role === "AO") {
-        days = 3;
-      } else {
-        days = 0;
-      }
+  const { role } = req;
 
-      const DaysAgo = new Date();
-      DaysAgo.setDate(DaysAgo.getDate() - days);
+  const roleDaysMapping = {
+    HOD: 10,
+    DSW: 7,
+    AO: 3,
+    Warden: 0,
+  };
 
-      const complaints = await Complaints.find({
-        $or: [{ isCritical: true }, { createdAt: { $gte: DaysAgo } }],
-      });
-
-      if (complaints.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No critical or recent complaints found" });
-      }
-
-      return res.status(200).json({
-        message: "Critical or recent complaints fetched successfully",
-        complaints,
-      });
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-  } else {
+  if (!roleDaysMapping.hasOwnProperty(role)) {
     return res
-      .status(404)
+      .status(403)
       .json({ message: "You are not allowed to see this data" });
+  }
+
+  try {
+    let filter = {};
+
+    if (role !== "Warden") {
+      const days = roleDaysMapping[role];
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - days);
+
+      filter = {
+        $or: [{ isCritical: true }, { createdAt: { $gte: daysAgo } }],
+      };
+    }
+
+    const complaints = await Complaints.find(filter);
+
+    if (!complaints.length) {
+      return res
+        .status(404)
+        .json({ message: "No complaints found for your role" });
+    }
+
+    return res.status(200).json({
+      message: "Complaints fetched successfully",
+      complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

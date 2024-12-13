@@ -3,6 +3,7 @@ import {
   checkEmail,
   fetchUser,
   getAllUsers,
+  getUsersById,
   userLogin,
   userRegister,
 } from "../controllers/user.controllers.js";
@@ -16,5 +17,6 @@ router.post("/email", checkEmail);
 router.post("/login", userLogin);
 router.post("/register", userRegister);
 router.get("/all", adminTokenCheck, getAllUsers);
+router.get("/:id", adminTokenCheck, getUsersById);
 
 export default router;

@@ -115,3 +115,27 @@ export const userRegister = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const checkEmail = async (req, res) => {
+  const { email } = req.body;
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid or missing email format" });
+  }
+
+  try {
+    // Check if email exists in the database
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    // Email does not exist
+    return res.status(200).json({ message: "Email is available" });
+  } catch (err) {
+    console.error("Error while checking email:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

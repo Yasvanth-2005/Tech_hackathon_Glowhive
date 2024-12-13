@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const adminTokenCheck = async (req, res, next) => {
+export const verifyUserToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -12,17 +12,15 @@ const adminTokenCheck = async (req, res, next) => {
       return res.status(401).json({ message: "Token not provided" });
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_ADMIN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     if (!decodedToken) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    req.admin = decodedToken.adminId;
-    req.role = decodedToken.adminRole;
+    req.user = decodedToken.userId;
     next();
   } catch (error) {
+    console.log(error.message);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };
-
-export default adminTokenCheck;

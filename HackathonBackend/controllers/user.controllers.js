@@ -186,7 +186,7 @@ export const updateProfile = async (req, res) => {
   const { username } = req.body;
 
   try {
-    if (username === "") {
+    if (username === "" || !username) {
       return res.status(400).json({ message: "Username is required" });
     }
 

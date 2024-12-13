@@ -183,16 +183,19 @@ export const updateChecking = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const userId = req.user;
-  const { username } = req.body;
+  const { username, password } = req.body;
 
   try {
     if (username === "" || !username) {
       return res.status(400).json({ message: "Username is required" });
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { username },
+      { username, password: hashedPassword },
       { new: true }
     );
 

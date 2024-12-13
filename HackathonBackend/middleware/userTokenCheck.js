@@ -20,6 +20,7 @@ export const verifyUserToken = async (req, res, next) => {
     req.user = decodedToken.userId;
     next();
   } catch (error) {
+    console.log(error.message);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

@@ -1,6 +1,5 @@
 import React from "react";
-import Layout from "../components/layout/Layout";
-import puc from "../assets/puc.svg";
+import Layout from "../../components/layout/Layout";
 
 const Dashboard = () => {
   return (
@@ -9,16 +8,7 @@ const Dashboard = () => {
         <div className="registrations-data grid grid-cols-1 grid-rows-2 lg:grid-cols-2 gap-5 lg:grid-rows-1 w-full">
           <div className="profile-card w-full flex flex-col md:flex-row items-center p-4 bg-white shadow-md rounded-lg  mx-auto">
             {/* Profile Image */}
-            <div className="profile-image w-[130px] h-[130px] bg-zinc-200  overflow-hidden flex-shrink-0">
-              {/* Use your image source here */}
-              {/* <img
-                src="your-image-url.jpg" // Replace with your image URL
-                alt="Profile"
-                className="w-full h-full object-cover"
-              /> */}
-              {/* If no image is available, fallback to an icon */}
-              {/* <FaUserCircle className="w-full h-full text-purple-600" /> */}
-            </div>
+            <div className="profile-image w-[130px] h-[130px] bg-zinc-200  overflow-hidden flex-shrink-0"></div>
 
             {/* Profile Details */}
             <div className="profile-details mt-4 md:mt-0 md:ml-6 text-center md:text-left">

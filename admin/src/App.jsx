@@ -1,12 +1,14 @@
 import React from 'react'
 import './App.css'
 import { BrowserRouter as Router,Routes,Route } from 'react-router-dom'
-import Layout from './components/layout/Layout'
-import Dashboard from './pages/Dashboard'
+import Dashboard from './pages/dashboard/Dashboard'
 import Login from './auth/Login'
-import Notifications from './pages/Notifications'
+import Notifications from './pages/notifications/Notifications'
+import { useSelector } from 'react-redux'
 
 const App = () => {
+  const user = useSelector((state) => state.auth.user)
+  console.log(user)
   return (
     <Router>
       <Routes>

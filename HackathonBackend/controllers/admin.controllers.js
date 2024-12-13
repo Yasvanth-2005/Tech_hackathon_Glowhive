@@ -90,3 +90,24 @@ export const adminRegister = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const getAdmin = async (req, res) => {
+  const adminId = req.admin;
+
+  try {
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin Not Found" });
+    }
+
+    const adminResponse = {
+      ...admin._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ admin: adminResponse });
+  } catch (error) {
+    console.error("Error during admin fetch:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import adminRoutes from "./routes/admin.route.js";
+import userRoutes from "./routes/user.route.js";
 
 // Middleware
 dotenv.config();
@@ -30,3 +31,4 @@ mongoose
 
 // Routes
 app.use("/api/admin", adminRoutes);
+app.use("/api/user", userRoutes);

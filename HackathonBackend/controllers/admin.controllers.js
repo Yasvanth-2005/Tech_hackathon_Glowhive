@@ -6,6 +6,10 @@ export const adminLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    if (!password || !email) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const emailRegex = /.+@.+\..+/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
@@ -22,9 +26,9 @@ export const adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { adminId: admin._id },
+      { adminId: admin._id, adminRole: admin.role },
       process.env.JWT_ADMIN_SECRET,
-      { expiresIn: "2d" }
+      { expiresIn: "12h" }
     );
 
     const adminResponse = {

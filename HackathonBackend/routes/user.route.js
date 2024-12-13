@@ -20,7 +20,7 @@ router.post("/login", userLogin);
 router.post("/register", userRegister);
 router.get("/all", adminTokenCheck, getAllUsers);
 router.get("/:id", adminTokenCheck, getUsersById);
-router.patch("/edit/:id", verifyUserToken, updateProfile);
+router.patch("/edit", verifyUserToken, updateProfile);
 router.put("/checking", verifyUserToken, updateChecking);
 
 export default router;

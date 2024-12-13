@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import adminRoutes from "./routes/admin.route.js";
 import userRoutes from "./routes/user.route.js";
 import complaintsRoutes from "./routes/complaints.route.js";
+import notificationRoutes from "./routes/notifications.route.js";
 
 // Middleware
 dotenv.config();
@@ -34,3 +35,4 @@ mongoose
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/complaints", complaintsRoutes);
+app.use("/api/notifications", notificationRoutes);

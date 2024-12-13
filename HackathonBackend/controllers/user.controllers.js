@@ -46,9 +46,7 @@ export const userLogin = async (req, res) => {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "12h",
-    });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
     const userResponse = {
       ...user._doc,
@@ -95,9 +93,7 @@ export const userRegister = async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "2d",
-    });
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
 
     const userResponse = {
       ...newUser._doc,

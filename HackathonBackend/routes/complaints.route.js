@@ -2,10 +2,7 @@ import express from "express";
 import { verifyUserToken } from "../middleware/userTokenCheck.js";
 import {
   getAllComplaints,
-  getAOComplaints,
   getComplaintDetails,
-  getDSWComplaints,
-  getHODComplaints,
   sendComplaint,
   updateComplaint,
   getUserComplaintDetails,
@@ -19,9 +16,6 @@ router.get("/user", verifyUserToken, getUserComplaintDetails);
 
 router.put("/:id", adminTokenCheck, updateComplaint);
 router.get("/admin", adminTokenCheck, getAllComplaints);
-router.get("/admin/ao", adminTokenCheck, getAOComplaints);
-router.get("/admin/dsw", adminTokenCheck, getDSWComplaints);
-router.get("/admin/hod", adminTokenCheck, getHODComplaints);
 router.get("/:id", adminTokenCheck, getComplaintDetails);
 
 export default router;

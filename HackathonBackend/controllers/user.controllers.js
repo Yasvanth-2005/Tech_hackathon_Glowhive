@@ -139,3 +139,17 @@ export const checkEmail = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    if (!users) {
+      return res.status(404).json({ message: "Users not found" });
+    }
+
+    return res.status(200).json({ users });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

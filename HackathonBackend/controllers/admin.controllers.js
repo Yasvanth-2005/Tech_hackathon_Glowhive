@@ -115,3 +115,29 @@ export const getAdmin = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const getAllAdmins = async (req, res) => {
+  const { role } = req;
+
+  if (role !== "HOD") {
+    return res
+      .status(403)
+      .json({ message: "You have no permission to access this data" });
+  }
+
+  try {
+    const admins = await Admin.find().select("-password");
+
+    if (!admins.length) {
+      return res.status(404).json({ message: "No admins found" });
+    }
+
+    return res.status(200).json({
+      message: "Admins fetched successfully",
+      admins,
+    });
+  } catch (error) {
+    console.error("Error fetching admins:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

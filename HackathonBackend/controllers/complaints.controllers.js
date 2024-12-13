@@ -80,58 +80,59 @@ export const updateComplaint = async (req, res) => {
   const { status } = req.body;
 
   try {
-    const modifiedComplaint = await Complaints.findByIdAndUpdate(id, {
-      status,
-    });
-
-    if (!modifiedComplaint) {
-      return res.status(404).json({ message: "Updation Failed" });
+    const validStatuses = ["Pending", "Rejected", "Solved"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid Status" });
     }
 
-    return res.status(200).json({ message: "Complaint Updated Successfully" });
+    const complaint = await Complaints.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found" });
+    }
+
+    if (complaint.status === "Solved") {
+      return res
+        .status(400)
+        .json({ message: "Complaint is already solved. Cannot update." });
+    }
+
+    complaint.status = status;
+    await complaint.save();
+
+    return res
+      .status(200)
+      .json({ message: "Complaint Updated Successfully", complaint });
   } catch (error) {
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: "Validation Error", errors });
     }
 
-    console.error("Error during admin registration:", error);
+    console.error("Error during complaint update:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const getAllComplaints = async (req, res) => {
   const role = req.role;
-
   if (role === "HOD" || role === "DSW" || role === "AO" || role === "Warden") {
     try {
-      const complaints = await Complaints.find();
-
-      if (!complaints) {
-        return res.status(404).json({ message: "Complaints Not Found" });
+      let days = 0;
+      if (role === "HOD") {
+        days = 10;
+      } else if (role === "DSW") {
+        days = 7;
+      } else if (role === "AO") {
+        days = 3;
+      } else {
+        days = 0;
       }
 
-      return res.status(200).json({ complaints });
-    } catch (error) {
-      console.log(error.message);
-      return res.status(500).json({ messgae: "Internal Server Error" });
-    }
-  } else {
-    return res
-      .status(404)
-      .json({ message: "You are not allowed to see this data" });
-  }
-};
-
-export const getAOComplaints = async (req, res) => {
-  const role = req.role;
-  if (role === "HOD" || role === "DSW" || role === "AO") {
-    try {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      const DaysAgo = new Date();
+      DaysAgo.setDate(DaysAgo.getDate() - days);
 
       const complaints = await Complaints.find({
-        $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
+        $or: [{ isCritical: true }, { createdAt: { $gte: DaysAgo } }],
       });
 
       if (complaints.length === 0) {
@@ -155,71 +156,21 @@ export const getAOComplaints = async (req, res) => {
   }
 };
 
-export const getDSWComplaints = async (req, res) => {
-  const role = req.role;
-  if (role === "HOD" || role === "DSW") {
-    try {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 7);
+export const getComplaintDetails = async (req, res) => {
+  const { id } = req.params;
 
-      const complaints = await Complaints.find({
-        $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
-      });
-
-      if (complaints.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No critical or recent complaints found" });
-      }
-
-      return res.status(200).json({
-        message: "Critical or recent complaints fetched successfully",
-        complaints,
-      });
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+  try {
+    const complaint = await Complaints.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ message: "Message not found" });
     }
-  } else {
-    return res
-      .status(404)
-      .json({ message: "You are not allowed to see this data" });
+
+    return res.status(200).json({ complaint });
+  } catch (error) {
+    console.error("Error fetching complaint:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-export const getHODComplaints = async (req, res) => {
-  const role = req.role;
-  if (role === "HOD") {
-    try {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 10);
-
-      const complaints = await Complaints.find({
-        $or: [{ isCritical: true }, { createdAt: { $gte: threeDaysAgo } }],
-      });
-
-      if (complaints.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No critical or recent complaints found" });
-      }
-
-      return res.status(200).json({
-        message: "Critical or recent complaints fetched successfully",
-        complaints,
-      });
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-  } else {
-    return res
-      .status(404)
-      .json({ message: "You are not allowed to see this data" });
-  }
-};
-
-export const getComplaintDetails = async (req, res) => {};
 
 export const getUserComplaintDetails = async (req, res) => {
   const userId = req.user;

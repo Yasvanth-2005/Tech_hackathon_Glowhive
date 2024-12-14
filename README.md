@@ -46,12 +46,17 @@ The tech stack for your app can be organized into the following categories:
 Framework/Library: Flutter
 UI/UX Design: Figma or Adobe XD (for designing app layouts and user flows)
 State Management: Redux or Context API
-Styling: Styled Components, Tailwind CSS
+
+[Link Text](https://admin-glowhive.netlify.app/)
+
 ## Backend
 Server Framework: Node.js with Express.js (for handling APIs and business logic)
 Database:
 MongoDB (NoSQL database for complaint and user data)
 Authentication:  JWT (JSON Web Token)
+
+[Link Text]( https://glowhive-hackthon.onrender.com/api/)
+
 ## Hosting
 Cloud Provider:
 AWS (Amazon Web Services) or Google Cloud Platform (GCP)
@@ -118,7 +123,7 @@ Git for version control.
 3) Set Environment Variables
 4) Start the Backend Server
    
-[Link Text]( https://glowhive-hackthon.onrender.com/api/)
+
 
 ## Frontend Setup
 1)Navigate to the Frontend Directory
@@ -126,7 +131,7 @@ Git for version control.
 3)Set Up Environment Variables
 4)Run the Frontend Application
 
-[Link Text](https://admin-glowhive.netlify.app/)
+
 
 ## Database Setup
 1)Use MongoDB for Data Management

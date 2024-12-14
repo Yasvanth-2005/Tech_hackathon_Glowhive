@@ -15,7 +15,18 @@ Users can file complaints categorized by severity (critical/non-critical). Criti
 Users can monitor the progress of their complaints, receive updates, and resend notifications if necessary.
 
 ### SOS Feature:
-In emergencies, users can trigger the SOS button to record audio or video via a fake call. The recording is sent to designated officials or emergency contacts. Mobile gestures, such as pressing the power button multiple times, are also supported for activating the SOS feature.
+In case of an emergency, the SOS feature allows users to tap a button that triggers a fake call. During this call, the app records audio or video of the situation, capturing important details. These recordings are then automatically sent to the pre-listed emergency contacts or the designated authorities for swift response and action. This ensures that the incident is documented with both SOS video capturing and SOS audio capturing, which can serve as valuable evidence for any case.
+
+Additionally, if you encounter network connectivity issues or cannot open the app, predefined mobile gestures (e.g., pressing the power button multiple times) can automatically trigger an emergency call, ensuring that emergency services or contacts are notified and assistance is on its way, even without internet access or opening the app.
+### Mobile Gestures:
+The mobile gesturing process is designed to provide an additional layer of safety in case you cannot access the app due to network issues, app unresponsiveness, or other emergencies. This feature allows users to trigger an emergency action pressing the power button multiple times (typically 3 to 5 times) can activate an emergency call or the SOS feature without directly interacting with the phone's screen.
+#### Initiates SOS Action:
+The app automatically starts recording audio or video of the situation, just like the SOS button within the app.
+#### Emergency Call Activation:
+If the app is unable to send the SOS alert directly due to network issues, the gesture can initiate an emergency call to pre-listed contacts or emergency services.
+#### Notifies Authorities: 
+Once the gesture activates the SOS feature, the app will send the audio/video recording to the designated authorities or emergency contacts in your list.
+
 
 ### Complaint History:
 A log of all filed complaints with their statuses is maintained, ensuring transparency and accountability.
@@ -35,13 +46,18 @@ The tech stack for your app can be organized into the following categories:
 Framework/Library: Flutter
 UI/UX Design: Figma or Adobe XD (for designing app layouts and user flows)
 State Management: Redux or Context API
-Styling: Styled Components, Tailwind CSS
+
+[https://admin-glowhive.netlify.app/](https://admin-glowhive.netlify.app/)
+
 ## Backend
 Server Framework: Node.js with Express.js (for handling APIs and business logic)
 Database:
 MongoDB (NoSQL database for complaint and user data)
 Authentication:  JWT (JSON Web Token)
-## Cloud and Hosting
+
+[https://glowhive-hackthon.onrender.com/api/]( https://glowhive-hackthon.onrender.com/api/)
+
+## Hosting
 Cloud Provider:
 AWS (Amazon Web Services) or Google Cloud Platform (GCP)
 Firebase Cloud Functions (for serverless event handling)
@@ -49,18 +65,35 @@ Firebase Cloud Functions (for serverless event handling)
 ## Notifications
 Push Notifications: Firebase Cloud Messaging (FCM)
 Real-Time Updates: Socket.IO (for instant status updates and SOS responses)
+
 ## Security
-Encryption:
-HTTPS for secure data transmission
-AES or RSA for sensitive data like recordings
-Access Control: Role-based authorization for different levels of authority
+
+### NoSQL Injection Prevention:
+Use parameterized queries or ORMs like Mongoose, and validate inputs with express-validator to prevent injection attacks.
+
+### XSS Prevention: 
+Sanitize user-generated content with DOMPurify and implement a Content Security Policy (CSP) to block malicious scripts.
+
+### CSRF Protection:
+Use CSRF tokens and set SameSite cookie attributes to prevent cross-site attacks.
+
+### Unsafe Redirects:
+Validate and whitelist URLs before redirecting users to prevent malicious redirects.
+
+### Malicious File Uploads:
+Validate file types, scan uploads with tools like ClamAV, and store files securely outside the web root.
+
+### Session Handling:
+Secure sessions with Redis or JWT tokens, and ensure cookies are marked as HttpOnly, Secure, and SameSite.
+
+### Input Sanitization:
+Use libraries like express-validator or Joi to sanitize and validate all inputs before processing.
+
+
 ## SOS Feature and Gestures
 Gesture Recognition: Native platform capabilities (Android/iOS) using APIs like:
 Android: Accessibility Services, Broadcast Receivers for Power Button detection
 iOS: Gesture Recognizers and Motion APIs
-## DevOps
-Version Control: Git and GitHub
-CI/CD Tools: GitHub Actions, Jenkins, or Bitrise (for automated builds and deployments)
 ## Testing
 Frontend Testing: Jest, Detox (for React Native apps)
 API Testing: Postman, Newman
@@ -89,11 +122,17 @@ Git for version control.
 2) Install Dependencies
 3) Set Environment Variables
 4) Start the Backend Server
+   
+
+
 ## Frontend Setup
 1)Navigate to the Frontend Directory
 2)Install Dependencies
 3)Set Up Environment Variables
 4)Run the Frontend Application
+
+
+
 ## Database Setup
 1)Use MongoDB for Data Management
 2)Migrate or Seed Data 

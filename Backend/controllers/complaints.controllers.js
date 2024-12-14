@@ -28,13 +28,15 @@ export const sendComplaint = async (req, res) => {
         .json({ message: "File upload failed", error: err });
     }
 
+    const finalUserId = userId?.trim() ? userId : null;
+
     const user = req.user;
     const {
       typeOfComplaint,
       statement,
       description,
       category,
-      userId,
+      userId: finalUserId,
       isCritical,
       location,
       time,

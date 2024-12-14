@@ -391,7 +391,7 @@ export const postSOS = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL, // Use environment variables
+        user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
       },
     });
@@ -411,9 +411,9 @@ export const postSOS = async (req, res) => {
           <h5 style="text-align:center">Dear Authority,</h5>
           <p style="text-align:center">The app recognizes that one of your User in Threat Situation.  </p>
           <pre style="text-align:center">
-          Name of User: ${userResponse.username}
-          Contact Information: +91 ${userResponse.phno}
-          Location: ${userResponse.location}
+            Name of User: ${userResponse.username}
+            Contact Information: +91 ${userResponse.phno}
+            Location: ${location}
           </pre>
         `,
         attachments: attachments.map((att) => ({

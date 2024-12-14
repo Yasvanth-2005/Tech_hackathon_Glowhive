@@ -129,6 +129,7 @@ export const updateComplaint = async (req, res) => {
 
 export const getAllComplaints = async (req, res) => {
   const { role } = req;
+  console.log("User Role:", role);
 
   const roleDaysMapping = {
     HOD: 10,
@@ -146,7 +147,16 @@ export const getAllComplaints = async (req, res) => {
   try {
     let filter = {};
 
-    if (role !== "Warden") {
+    if (role === "HOD") {
+      // HOD: Complaints 10 days old or more
+      const tenDaysAgo = new Date();
+      tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+
+      filter = {
+        createdAt: { $lt: tenDaysAgo }, // Complaints older than 10 days
+      };
+    } else if (role !== "Warden") {
+      // Other roles: Complaints within their respective roleDaysMapping time frame
       const days = roleDaysMapping[role];
       const daysAgo = new Date();
       daysAgo.setDate(daysAgo.getDate() - days);

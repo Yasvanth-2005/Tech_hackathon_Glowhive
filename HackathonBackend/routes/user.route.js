@@ -12,7 +12,6 @@ import {
   userLogin,
   userRegister,
   verifyOtp,
-  postSOS,
 } from "../controllers/user.controllers.js";
 import { verifyUserToken } from "../middleware/userTokenCheck.js";
 import adminTokenCheck from "../middleware/adminTokenCheck.js";

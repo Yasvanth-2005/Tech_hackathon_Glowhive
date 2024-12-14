@@ -38,6 +38,9 @@ export const sendComplaint = async (req, res) => {
       isCritical,
       location,
       time,
+      victinDetails,
+      harasserDetails,
+      harasserType,
     } = req.body;
 
     const img = req.files?.img?.[0]?.path || null;
@@ -55,6 +58,9 @@ export const sendComplaint = async (req, res) => {
         isCritical,
         location,
         time,
+        victinDetails,
+        harasserDetails,
+        harasserType,
       });
 
       if (!complaint) {

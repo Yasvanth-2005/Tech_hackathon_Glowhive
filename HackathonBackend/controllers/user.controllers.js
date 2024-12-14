@@ -1,6 +1,9 @@
 import User from "../models/user.model.js";
+import Otp from "../models/otp.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 export const fetchUser = async (req, res) => {
   const userId = req.user;
@@ -36,7 +39,9 @@ export const userLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email }).populate("complaints");
+    const user = await User.findOne({ email: email.toLowerCase() }).populate(
+      "complaints"
+    );
     if (!user) {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
@@ -80,14 +85,12 @@ export const userRegister = async (req, res) => {
         .json({ message: "User with this email already exists" });
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create the new admin user
     const newUser = await User.create({
       username: username.toUpperCase(),
-      email,
+      email: email.toLowerCase(),
       phno,
       collegeId,
       password: hashedPassword,
@@ -115,20 +118,17 @@ export const userRegister = async (req, res) => {
 export const checkEmail = async (req, res) => {
   const { email } = req.body;
 
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid or missing email format" });
   }
 
   try {
-    // Check if email exists in the database
-    const emailExists = await User.findOne({ email });
+    const emailExists = await User.findOne({ email: email.toLowerCase() });
     if (emailExists) {
       return res.status(409).json({ message: "Email already exists" });
     }
 
-    // Email does not exist
     return res.status(200).json({ message: "Email is available" });
   } catch (err) {
     console.error("Error while checking email:", err.message);
@@ -183,38 +183,124 @@ export const updateChecking = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const userId = req.user;
-  const { username, password } = req.body;
+  const { username, password, oldPassword } = req.body;
 
   try {
-    if (username === "" || !username) {
+    if (!username || username.trim() === "") {
       return res.status(400).json({ message: "Username is required" });
+    }
+
+    if (!oldPassword || !password) {
+      return res.status(400).json({ message: "All Fields are required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isOldPasswordCorrect = await bcrypt.compare(
+      oldPassword,
+      user.password
+    );
+    if (!isOldPasswordCorrect) {
+      return res.status(400).json({ message: "Invalid User Old Password" });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { username, password: hashedPassword },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    user.username = username;
+    user.password = hashedPassword;
+    const updatedUser = await user.save();
 
     const populatedUser = await updatedUser.populate("complaints");
-
-    const user = {
+    const userResponse = {
       ...populatedUser._doc,
       password: undefined,
     };
 
     return res
       .status(200)
-      .json({ message: "Profile Updated Successfully", user });
+      .json({ message: "Profile Updated Successfully", user: userResponse });
   } catch (err) {
-    console.log(err.message);
+    console.error("Error during profile update:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const sendOtp = async (req, res) => {
+  const { email } = req.body;
+
+  const rguktnEmailRegex = /^[NnRrOoSs]\d{6}@rguktn\.ac\.in$/;
+  if (!email || !rguktnEmailRegex.test(email)) {
+    return res.status(400).json({ message: "RGUKTN Email is required" });
+  }
+
+  try {
+    const emailExists = await User.findOne({ email: email.toLowerCase() });
+    if (emailExists) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    const existingOtp = await Otp.findOne({ email: email.toLowerCase() });
+    if (existingOtp) {
+      existingOtp.otp = otp;
+      await existingOtp.save();
+    } else {
+      const newOtp = new Otp({ email: email.toLowerCase(), otp });
+      await newOtp.save();
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP for Confirmation",
+      html: `<p>Your OTP for email confirmation is: <strong>${otp}</strong></p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ message: "OTP sent to email successfully" });
+  } catch (err) {
+    console.error("Error while sending OTP:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    const existingOtp = await Otp.findOne({ email: email.toLowerCase() });
+
+    if (!existingOtp) {
+      return res.status(401).json({ message: "OTP expired or not found" });
+    }
+
+    if (existingOtp.otp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    await Otp.deleteOne({ email: email.toLowerCase() });
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (err) {
+    console.error("Error during OTP verification:", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

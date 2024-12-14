@@ -1,4 +1,5 @@
 import Complaints from "../models/complaints.model.js";
+import User from "../models/user.model.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -27,6 +28,7 @@ export const sendComplaint = async (req, res) => {
         .json({ message: "File upload failed", error: err });
     }
 
+    const user = req.user;
     const {
       typeOfComplaint,
       statement,
@@ -59,6 +61,10 @@ export const sendComplaint = async (req, res) => {
         return res.status(404).json({ message: "Posting Complaint Failed" });
       }
 
+      await User.findByIdAndUpdate(user, {
+        $push: { complaints: complaint._id },
+      });
+
       return res.status(200).json({
         message: "New Complaint Sent Successfully",
         complaint,
@@ -80,41 +86,113 @@ export const updateComplaint = async (req, res) => {
   const { status } = req.body;
 
   try {
-    const modifiedComplaint = await Complaints.findByIdAndUpdate(id, {
-      status,
-    });
-
-    if (!modifiedComplaint) {
-      return res.status(404).json({ message: "Updation Failed" });
+    const validStatuses = ["Pending", "Rejected", "Solved"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid Status" });
     }
 
-    return res.status(200).json({ message: "Complaint Updated Successfully" });
+    const complaint = await Complaints.findById(id);
+    if (!complaint) {
+      return res.status(404).json({ message: "Complaint not found" });
+    }
+
+    if (complaint.status === "Solved") {
+      return res
+        .status(400)
+        .json({ message: "Complaint is already solved. Cannot update." });
+    }
+
+    complaint.status = status;
+    await complaint.save();
+
+    return res
+      .status(200)
+      .json({ message: "Complaint Updated Successfully", complaint });
   } catch (error) {
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: "Validation Error", errors });
     }
 
-    console.error("Error during admin registration:", error);
+    console.error("Error during complaint update:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const getAllComplaints = async (req, res) => {};
+export const getAllComplaints = async (req, res) => {
+  const { role } = req;
 
-export const getAOComplaints = async (req, res) => {};
+  const roleDaysMapping = {
+    HOD: 10,
+    DSW: 7,
+    AO: 3,
+    Warden: 0,
+  };
 
-export const getDSWComplaints = async (req, res) => {};
+  if (!roleDaysMapping.hasOwnProperty(role)) {
+    return res
+      .status(403)
+      .json({ message: "You are not allowed to see this data" });
+  }
 
-export const getHODComplaints = async (req, res) => {};
+  try {
+    let filter = {};
 
-export const getComplaintDetails = async (req, res) => {};
+    if (role !== "Warden") {
+      const days = roleDaysMapping[role];
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - days);
+
+      filter = {
+        $or: [{ isCritical: true }, { createdAt: { $gte: daysAgo } }],
+      };
+    }
+
+    const complaints = await Complaints.find(filter).populate(
+      "userId",
+      "email username phno collegeId"
+    );
+
+    if (!complaints.length) {
+      return res
+        .status(404)
+        .json({ message: "No complaints found for your role" });
+    }
+
+    return res.status(200).json({
+      message: "Complaints fetched successfully",
+      complaints,
+    });
+  } catch (error) {
+    console.error("Error fetching complaints:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getComplaintDetails = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const complaint = await Complaints.findById(id).populate(
+      "userId",
+      "email username phno collegeId"
+    );
+    if (!complaint) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    return res.status(200).json({ complaint });
+  } catch (error) {
+    console.error("Error fetching complaint:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export const getUserComplaintDetails = async (req, res) => {
   const userId = req.user;
 
   try {
-    const userComplaints = await Complaint.find({ userId });
+    const userComplaints = await Complaints.find({ userId });
     if (!userComplaints) {
       return res.status(404).json({ message: "User Not Found" });
     }

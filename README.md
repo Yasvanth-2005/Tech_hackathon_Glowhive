@@ -59,7 +59,7 @@ Authentication:  JWT (JSON Web Token)
 
 ## Postman Api link
 
-[https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/collection/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4?action=share&creator=40295472&active-environment=40295472-68c052f1-471a-46c9-b396-2d1455ab5631](https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/collection/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4?action=share&creator=40295472&active-environment=40295472-68c052f1-471a-46c9-b396-2d1455ab5631)
+[https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/documentation/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4](https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/documentation/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4)
 
 
 ## Hosting

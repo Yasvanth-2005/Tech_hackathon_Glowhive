@@ -1,4 +1,4 @@
-import SOS from "../models/sos.model.js";
+import SOS from "../models/sosMembers.model.js";
 
 export const getAllSOSGlobal = async (req, res) => {
   try {

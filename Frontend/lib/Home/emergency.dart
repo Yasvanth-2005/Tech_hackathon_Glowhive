@@ -9,7 +9,7 @@ class Emergency extends StatefulWidget {
 
 class _EmergencyState extends State<Emergency> {
   final List<Map<String, String>> contacts = [
-    {"title": "Police", "number": "9392390688"},
+    {"title": "Police", "number": "100"},
     {"title": "Child Helpline", "number": "1098"},
     {"title": "Women Helpline", "number": "181"},
     {"title": "Fire Service", "number": "101"},
@@ -18,26 +18,7 @@ class _EmergencyState extends State<Emergency> {
     {"title": "National Emergency", "number": "112"},
   ];
 
-  Future<void> _makeCall(String number, BuildContext context) async {
-    // Check CALL_PHONE permission
-    if (await Permission.phone.request().isGranted) {
-      final Uri launchUri = Uri(
-        scheme: 'tel',
-        path: number,
-      );
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not launch $number')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Phone permission not granted')),
-      );
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +100,8 @@ class _EmergencyState extends State<Emergency> {
                     trailing: IconButton(
                       icon: Icon(Icons.call, color: Colors.black),
                       onPressed: () {
-                        _makeCall(contacts[index]["number"]!, context);
+                         final phoneNumber = contacts[index]["number"]!;
+                        launch('tel:$phoneNumber');
                       },
                     ),
                   ),

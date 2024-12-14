@@ -7,9 +7,33 @@ import 'package:girls_grivince/Home/status.dart';
 import 'package:girls_grivince/Home/sos.dart';
 import 'package:girls_grivince/widgets/categorybtn.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  final bool check;
+  final String email;
+  final String name;
+  final String phone;
+  final String count;
+  const Home({
+    super.key,
+    required this.check,
+    required this.email,
+    required this.name,
+    required this.phone,
+    required this.count,
+  });
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    final username = widget.name;
+    final useremail = widget.email;
+    final userphone = widget.phone;
+    final complintscount = widget.count;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -40,7 +64,7 @@ class Home extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "Mohan",
+                  widget.name,
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -88,8 +112,8 @@ class Home extends StatelessWidget {
                         },
                       ),
                       Categorybtn(
-                        title: "Emergency Contacts",
-                        imagePath: 'assets/img/call.png',
+                        title: "Support",
+                        imagePath: 'assets/img/support.png',
                         function: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -138,7 +162,12 @@ class Home extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (builder) => Profile(),
+                    builder: (builder) => Profile(
+                      username: username,
+                      useremail: useremail,
+                      userphonenum: userphone,
+                      complaintscount: complintscount,
+                    ),
                   ),
                 );
               },

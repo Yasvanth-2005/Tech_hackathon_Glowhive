@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:girls_grivince/Home/upload.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Sos extends StatefulWidget {
   @override
@@ -7,6 +12,19 @@ class Sos extends StatefulWidget {
 
 class _SosState extends State<Sos> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+
+  getVideoFile(ImageSource sourceImg) async{
+    final videoFile = await ImagePicker().pickVideo(source: sourceImg);
+    
+    if(videoFile != null){
+      Get.to(
+        Upload(
+          videoFile : File(videoFile.path),
+          videoPath : videoFile.path,
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -25,6 +43,8 @@ class _SosState extends State<Sos> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Color customPurple = Color.fromRGBO(169, 61, 231, 0.91);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -36,7 +56,7 @@ class _SosState extends State<Sos> with SingleTickerProviderStateMixin {
             child: Container(
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.purple,
+                color: customPurple,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(50),
                   bottomRight: Radius.circular(50),
@@ -70,9 +90,35 @@ class _SosState extends State<Sos> with SingleTickerProviderStateMixin {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple,
+                    color: customPurple,
                   ),
                 ),
+              ),
+            ),
+          ),
+
+          // Adding two images at the top of the screen, overlapping the purple container
+          Positioned(
+            left: 30,
+            top: 40,
+            child: ClipOval(
+              child: Image.asset(
+                'assets/img/icon.png', // Replace with your image path
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 30,
+            top: 60,
+            child: ClipOval(
+              child: Image.asset(
+                'assets/img/rgukt.png', // Replace with your image path
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -140,59 +186,61 @@ class _SosState extends State<Sos> with SingleTickerProviderStateMixin {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.5 - 140,
             left: 30,
-            child: _buildGridItem(Icons.video_call, 'Video', Colors.blue),
+            child: _buildGridItem(Icons.video_call, 'Video', customPurple,(){getVideoFile(ImageSource.camera);}),
           ),
           Positioned(
             top: MediaQuery.of(context).size.height * 0.5 - 140,
             right: 30,
-            child: _buildGridItem(Icons.call, 'Fake Call', Colors.green),
+            child: _buildGridItem(Icons.call, 'Fake Call', customPurple,(){}),
           ),
           Positioned(
             bottom: MediaQuery.of(context).size.height * 0.5 - 140,
             left: 30,
-            child: _buildGridItem(
-                Icons.contact_emergency, 'SOS Contacts', Colors.purple),
+            child: _buildGridItem(Icons.contact_emergency, 'SOS Contacts', customPurple,(){}),
           ),
           Positioned(
             bottom: MediaQuery.of(context).size.height * 0.5 - 140,
             right: 30,
-            child: _buildGridItem(Icons.help, 'Help', Colors.orange),
+            child: _buildGridItem(Icons.help, 'Help', customPurple,(){}),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGridItem(IconData icon, String label, Color color) {
-    return Container(
-      height: 100,
-      width: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            blurRadius: 4,
-            spreadRadius: 2,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: color),
-          SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+  Widget _buildGridItem(IconData icon, String label, Color color, VoidCallback function) {
+    return GestureDetector(
+      onTap: function,
+      child: Container(
+        height: 100,
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 4,
+              spreadRadius: 2,
+              offset: Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

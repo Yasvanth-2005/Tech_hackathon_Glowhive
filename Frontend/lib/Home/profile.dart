@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:girls_grivince/Home/editprofile.dart';
+import 'package:girls_grivince/Login/loginMain.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
+  final String username;
+  final String useremail;
+  final String userphonenum;
+  final String complaintscount;
+  const Profile({
+    super.key,
+    required this.username,
+    required this.useremail,
+    required this.userphonenum,
+    required this.complaintscount,
+  });
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,30 +37,61 @@ class Profile extends StatelessWidget {
                   height: 150,
                   fit: BoxFit.cover,
                 ),
-                // Overlay for back button and title
+                // Overlay for back button, title, and menu
                 Positioned(
                   top: 50,
                   left: 20,
+                  right: 20,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Image.asset(
-                          'assets/img/arrow2.png',
-                          height: 35,
-                          width: 43,
-                        ),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Image.asset(
+                              'assets/img/arrow2.png',
+                              height: 35,
+                              width: 43,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Profile',
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Profile',
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      // Three-dot menu
+                      PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert, color: Colors.white),
+                        onSelected: (value) {
+                          if (value == 'Edit Profile') {
+                            // Navigate to edit profile screen or implement edit functionality
+                            _editProfile();
+                          } else if (value == 'Sign Out') {
+                            // Implement sign-out functionality
+                            _signOut();
+                          }
+                        },
+                        position: PopupMenuPosition.under,
+                        offset: Offset(-30, -20),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'Edit Profile',
+                            child: Text('Edit Profile'),
+                          ),
+                          PopupMenuItem(
+                            value: 'Sign Out',
+                            child: Text('Sign Out'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -54,17 +104,20 @@ class Profile extends StatelessWidget {
                 SizedBox(height: 20),
                 CircleAvatar(
                   radius: 50,
+                  backgroundImage: NetworkImage(
+                    'https://via.placeholder.com/150', // Replace with actual image URL
+                  ),
                   child: Stack(
                     children: [
                       Positioned(
                         bottom: 10,
                         right: 0,
-                        child: Icon(Icons.camera_alt,),
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.purple,
+                        ),
                       ),
                     ],
-                  ),
-                  backgroundImage: NetworkImage(
-                    'https://via.placeholder.com/150', // Replace with actual image URL
                   ),
                 ),
                 SizedBox(height: 20),
@@ -78,21 +131,21 @@ class Profile extends StatelessWidget {
                   _buildProfileField(
                     icon: Icons.person,
                     label: 'Name',
-                    value: 'Kajal Mandraju',
-                    isEditable: true,
+                    value: widget.username,
+                    isEditable: false,
                   ),
                   SizedBox(height: 20),
                   _buildProfileField(
                     icon: Icons.email,
                     label: 'Email',
-                    value: 'kajalmandraju@gmail.com',
+                    value: widget.useremail,
                     isEditable: false,
                   ),
                   SizedBox(height: 20),
                   _buildProfileField(
                     icon: Icons.call,
                     label: 'Mobile Number',
-                    value: '9502774125',
+                    value: widget.userphonenum,
                     isEditable: false,
                   ),
                   SizedBox(height: 20),
@@ -114,7 +167,7 @@ class Profile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '5',
+                          widget.complaintscount,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -172,6 +225,27 @@ class Profile extends StatelessWidget {
             icon: Icon(Icons.edit, color: Colors.purple),
           ),
       ],
+    );
+  }
+
+  void _editProfile() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (builder) => EditProfile(
+            eemail: widget.useremail,
+            ename: widget.username,
+            ephone: widget.userphonenum,
+            ecount: widget.complaintscount,
+            ),
+      ),
+    );
+  }
+
+  void _signOut() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (builder) => Loginmain(),
+      ),
     );
   }
 }

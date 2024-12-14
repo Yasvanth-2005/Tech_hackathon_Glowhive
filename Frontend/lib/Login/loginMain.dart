@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:girls_grivince/Login/login.dart';
+import 'package:girls_grivince/Login/signup.dart';
 import 'package:girls_grivince/widgets/button.dart';
 
 class Loginmain extends StatelessWidget {
@@ -66,7 +67,11 @@ class Loginmain extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  // Add sign-up navigation logic here
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (builder) => Signup(),
+                    ),
+                  );
                 },
                 child: Text(
                   'Sign Up',

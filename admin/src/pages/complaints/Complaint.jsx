@@ -49,7 +49,11 @@ const Complaint = () => {
   const filteredComplaints = data?.complaints?.filter(
     (item) =>
       item.typeOfComplaint?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (new Date(item.createdAt).toLocaleString())?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      new Date(item.createdAt)
+        .toLocaleString()
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       item.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.userId?.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -79,7 +83,7 @@ const Complaint = () => {
         }
       );
       toast.success("Complaint rejected successfully!");
-      window.location.reload()
+      window.location.reload();
       setSelectedComplaint({ ...selectedComplaint, status: "Rejected" });
     } catch (error) {
       toast.error("Failed to reject complaint.");
@@ -97,7 +101,7 @@ const Complaint = () => {
         }
       );
       toast.success("Complaint solved successfully!");
-      window.location.reload()
+      window.location.reload();
       setSelectedComplaint({ ...selectedComplaint, status: "Solved" });
     } catch (error) {
       toast.error("Failed to mark complaint as solved.");
@@ -105,16 +109,16 @@ const Complaint = () => {
   };
 
   const statusStyle = (status) => {
-    if(status==="Pending"){
-      return "bg-yellow-200 text-yellow-800"
+    if (status === "Pending") {
+      return "bg-yellow-200 text-yellow-800";
     }
-    if(status==="Rejected"){
-      return "bg-red-200 text-red-800"
+    if (status === "Rejected") {
+      return "bg-red-200 text-red-800";
     }
-    if(status==="Solved"){
-      return "bg-green-200 text-green-800"
+    if (status === "Solved") {
+      return "bg-green-200 text-green-800";
     }
-  }
+  };
 
   return (
     <Layout>
@@ -158,7 +162,9 @@ const Complaint = () => {
                   </td>
                   <td className="ps-3 py-2">
                     <span
-                      className={`${statusStyle(item.status)} font-bold px-2 py-1 border rounded-lg shadow`}
+                      className={`${statusStyle(
+                        item.status
+                      )} font-bold px-2 py-1 border rounded-lg shadow`}
                     >
                       {item.status}
                     </span>

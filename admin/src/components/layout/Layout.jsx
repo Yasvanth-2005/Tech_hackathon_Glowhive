@@ -6,6 +6,10 @@ import { IoLogInOutline } from "react-icons/io5";
 import { MdNotificationsActive } from "react-icons/md";
 import { MdSpaceDashboard } from "react-icons/md";
 import { useSelector } from "react-redux";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { LuNotebookPen } from "react-icons/lu";
+
+
 // Breadcrumb Component
 const Breadcrumb = () => {
   const location = useLocation();
@@ -55,6 +59,16 @@ const Layout = ({ children }) => {
       label: "Notifications",
       path: "notifications",
       icon: MdNotificationsActive,
+    },
+    {
+      label: "Admins",
+      path: "admin",
+      icon: MdAdminPanelSettings,
+    },
+    {
+      label: "Complaints",
+      path: "complaint",
+      icon: LuNotebookPen,
     },
   ];
 

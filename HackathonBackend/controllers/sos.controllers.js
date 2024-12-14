@@ -21,6 +21,8 @@ export const postSOSGlobal = async (req, res) => {
   try {
     const newGlobalSOS = await SOS.create({
       phno,
+      name,
+      email,
     });
 
     if (!newGlobalSOS) {

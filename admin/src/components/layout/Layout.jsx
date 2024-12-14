@@ -8,6 +8,8 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { useSelector } from "react-redux";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { LuNotebookPen } from "react-icons/lu";
+import { FaPersonBreastfeeding } from "react-icons/fa6";
+
 
 
 // Breadcrumb Component
@@ -70,6 +72,16 @@ const Layout = ({ children }) => {
       path: "complaint",
       icon: LuNotebookPen,
     },
+    {
+      label: "Support",
+      path: "support",
+      icon: FaPersonBreastfeeding,
+    },
+    {
+      label: "SOS",
+      path: "sos",
+      icon: FaPersonBreastfeeding,
+    },
   ];
 
   const location = useLocation();
@@ -103,7 +115,7 @@ const Layout = ({ children }) => {
             to="/"
             className="logo font-semibold text-purple-600 select-none px-3 text-2xl"
           >
-            Girl Life
+            Girl Grievence
           </Link>
         </div>
         <div className="flex items-center text-gray-700">

@@ -10,6 +10,10 @@ import CreateAdmin from "./pages/admin/CreateAdmin";
 import Complaint from "./pages/complaints/Complaint";
 import CreateNotification from "./pages/notifications/CreateNotification";
 import { Toaster } from "react-hot-toast";
+import Support from "./pages/support/Support";
+import AddSupport from "./pages/support/AddSupport";
+import SOS from "./pages/sos/SOS";
+import AddSOS from "./pages/sos/AddSOS";
 
 const App = () => {
   const user = useSelector((state) => state.auth.user);
@@ -28,6 +32,12 @@ const App = () => {
         <Route path="/admin/create" element={<CreateAdmin />} />
 
         <Route path="/complaint" element={<Complaint />} />
+
+        <Route path="/support" element={<Support />} />
+        <Route path="/support/add" element={<AddSupport />} />
+
+        <Route path="/sos" element={<SOS />} />
+        <Route path="/sos/new" element={<AddSOS />} />
       </Routes>
     </Router>
   );

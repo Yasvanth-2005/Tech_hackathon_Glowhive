@@ -256,6 +256,10 @@ const Notifications = () => {
           <div className="bg-white p-6 rounded-lg w-[97%] max-w-[600px]">
             <h2 className="text-xl font-bold mb-4">Edit Notification</h2>
             <div className="mb-4">
+              <label htmlFor="" className="font-semibold">
+                Links
+              </label>
+
               <input
                 type="text"
                 name="title"
@@ -266,6 +270,9 @@ const Notifications = () => {
               />
             </div>
             <div className="mb-4">
+              <label htmlFor="" className="font-semibold">
+                Links
+              </label>
               <textarea
                 name="description"
                 value={editNotification.description}
@@ -275,7 +282,10 @@ const Notifications = () => {
                 rows="4"
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-4 ">
+              <label htmlFor="" className="font-semibold">
+                Links
+              </label>
               <input
                 type="text"
                 name="links"

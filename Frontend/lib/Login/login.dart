@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:girls_grivince/Home/complaint.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:girls_grivince/Home/home.dart';
 import 'package:girls_grivince/Login/signup.dart';
 import 'package:girls_grivince/widgets/button.dart';
 import 'package:girls_grivince/widgets/otheroptions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -11,6 +16,90 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool isPasswordVisible = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
+  String? errorMessage;
+
+   // Function to store token
+  Future<void> storeToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
+
+  Future<void> loginUser() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    final url =
+        Uri.parse('https://glowhive-hackthon.onrender.com/api/user/login');
+    final body = {
+      "email": emailController.text.trim(),
+      "password": passwordController.text.trim(),
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(body),
+      );
+
+      print("Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        final data = json.decode(response.body);
+
+        // Save the token
+          await storeToken(data['token']);
+
+        // Check for user and token fields
+        if (data['user'] != null && data['token'] != null) {
+          // Navigate to Home screen on successful login
+          final ischeckd = data['user']['is_checked'];
+          final name = data['user']['username'];
+          final email = data['user']['email'];
+          final phone = data['user']['phno'];
+          final count = data['user']['complaints'].length.toString();
+          print(data['user']['complaints']);
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => Home(
+                check: ischeckd,
+                name: name,
+                email: email,
+                phone: phone,
+                count: count,
+              ),
+            ),
+          );
+        } else {
+          setState(() {
+            errorMessage = "Unexpected response format. Please try again.";
+          });
+        }
+      } else {
+        setState(() {
+          errorMessage = "Login failed. Status code: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      print("Error: $e");
+      setState(() {
+        errorMessage =
+            "An error occurred. Check your connection and try again.";
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +116,7 @@ class _LoginState extends State<Login> {
           ),
           // Back Arrow
           Positioned(
-            top: 43,
+            top: 53,
             left: 20,
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
@@ -41,7 +130,8 @@ class _LoginState extends State<Login> {
           // Login Form
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 80.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 80.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -55,7 +145,7 @@ class _LoginState extends State<Login> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 40),
                   // Email Field
                   Text(
                     'Email:',
@@ -66,6 +156,7 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    controller: emailController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.grey[200],
@@ -88,6 +179,7 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 10),
                   TextField(
+                    controller: passwordController,
                     obscureText: !isPasswordVisible,
                     decoration: InputDecoration(
                       filled: true,
@@ -113,17 +205,18 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 10),
+                  // Error Message
+                  if (errorMessage != null)
+                    Text(
+                      errorMessage!,
+                      style: TextStyle(color: Colors.red, fontSize: 14),
+                    ),
                   SizedBox(height: 30),
                   // Login Button
                   Button(
-                    text: 'Login',
-                    function: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => Home(),
-                        ),
-                      );
-                    },
+                    text: isLoading ? 'Loading...' : 'Login',
+                    function: loginUser,
                   ),
                   SizedBox(height: 20),
                   // Sign-Up Text

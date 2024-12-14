@@ -13,6 +13,9 @@ const ComplaintUserSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    victinDetails: { type: String },
+    harasserDetails: { type: String },
+    harasserType: { type: String },
     category: { type: String },
     userId: {
       type: mongoose.Schema.ObjectId,
@@ -27,6 +30,7 @@ const ComplaintUserSchema = new mongoose.Schema(
     img: { type: String },
     video: { type: String },
     isCritical: { type: Boolean, default: false },
+    isAnonymus: { type: Boolean, default: false },
     location: { type: String },
     time: { type: String },
   },

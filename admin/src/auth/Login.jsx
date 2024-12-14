@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { signInStart, signInSuccess, signInFailure } from "../store/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInSuccess } from "../store/authSlice";
+import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 
 const Login = () => {
-  const user = useSelector((state) => state.auth.user?.admin);
+  // const user = useSelector((state) => state.auth.user?.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // To handle any error during login
-  const [loading, setLoading] = useState(false); // To show loading state during API call
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL; // Ensure this is set in your .env file
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   // Handling form submission
   const handleSubmit = async (e) => {
@@ -27,7 +27,7 @@ const Login = () => {
     dispatch(signInStart());
 
     setLoading(true);
-    setError(""); // Reset error on new login attempt
+    setError("");
 
     try {
       const response = await axios.post(`${apiUrl}/admin/login`, payload);
@@ -44,11 +44,14 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-      const errorMessage = err.response?.data?.message || "Invalid credentials!";
+      const errorMessage =
+        err.response?.data?.message || "Invalid credentials!";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
+      setEmail("");
+      setPassword("");
     }
   };
 
@@ -56,7 +59,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center">
       <Toaster position="top-center" reverseOrder={false} />
       <div className="w-[97%] max-w-md p-8 space-y-6 bg-white rounded-lg border border-black shadow-lg">
-        <h2 className="text-center text-3xl font-bold text-purple-600">Login</h2>
+        <h2 className="text-center text-3xl font-bold text-purple-600">
+          Login
+        </h2>
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {/* Email Field */}
           <div>
@@ -113,7 +118,7 @@ const Login = () => {
 
         {/* Footer Link */}
         <div className="text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Dont have an account?{" "}
           <a
             href="#"
             className="text-purple-600 hover:text-purple-500 font-semibold"

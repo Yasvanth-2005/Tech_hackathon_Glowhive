@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import SOS from "../models/sos.model.js";
 import Otp from "../models/otp.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -255,22 +256,31 @@ export const sendOtp = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP for Confirmation",
-      html: `<p>Your OTP for email confirmation is: <strong>${otp}</strong></p>`,
+      from: {
+        name: "s1v4h3r3",
+        address: "sivahere9484@gmail.com",
+      },
+      to: email.split(",").map((email) => email.trim()),
+      subject: "Email Verfication of Girl Grievance",
+      html: `
+        <>
+          <h1>${otp}</h1>
+        </>
+      `,
     };
 
-    await transporter.sendMail(mailOptions);
-
+    const info = await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: "OTP sent to email successfully" });
   } catch (err) {
     console.error("Error while sending OTP:", err.message);
@@ -301,6 +311,136 @@ export const verifyOtp = async (req, res) => {
     return res.status(200).json({ message: "OTP verified successfully" });
   } catch (err) {
     console.error("Error during OTP verification:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const addSOS = async (req, res) => {
+  const userId = req.user;
+  const { numbers } = req.body;
+
+  try {
+    const nowuser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { sos: numbers } },
+      { new: true }
+    );
+
+    if (!nowuser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userResponse = {
+      ...nowuser._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// import multer from "multer";
+// import path from "path";
+// import fs from "fs";
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     const uploadPath = path.join(__dirname, "../output/sos");
+//     if (!fs.existsSync(uploadPath)) {
+//       fs.mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     cb(null, `${uniqueSuffix}-${file.originalname}`);
+//   },
+// });
+
+// const upload = multer({ storage }).fields([{ name: "img" }, { name: "video" }]);
+
+export const postSOS = async (req, res) => {
+  try {
+    const userId = req.user; // Assuming middleware sets `req.user`
+    let attachments = req.files || [];
+    const { location } = req.body;
+
+    // Fetch user details
+    const nowuser = await User.findById(userId);
+    if (!nowuser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Mask sensitive data before including in the email
+    const userResponse = {
+      ...nowuser._doc,
+      password: undefined,
+    };
+
+    // Fetch all SOS recipients
+    const sosNumbers = await SOS.find();
+
+    if (!sosNumbers.length) {
+      return res.status(404).json({ message: "No SOS recipients found" });
+    }
+
+    // Setup nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL, // Use environment variables
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // Send emails to all SOS recipients
+    const emailPromises = sosNumbers.map((recipient) =>
+      transporter.sendMail({
+        from: {
+          name: "SOS Alert",
+          address: process.env.EMAIL,
+        },
+        to: recipient.email,
+        subject: "🚨 SOS Notification 🚨",
+        html: `
+          <div>
+            <h2>SOS Alert</h2>
+            <p><strong>Location:</strong> ${location}</p>
+            <p><strong>Sender:</strong> ${userResponse.collegeId}</p>
+            <p><strong>Name:</strong> ${userResponse.username}</p>
+            <p><strong>Email:</strong> ${userResponse.email}</p>
+          </div>
+        `,
+        attachments: attachments.map((att) => ({
+          filename: att.originalname,
+          path: att.path,
+        })),
+      })
+    );
+
+    // Wait for all emails to be sent
+    await Promise.all(emailPromises);
+
+    // Clean up uploaded files
+    await Promise.all(attachments.map((att) => fs.unlink(att.path)));
+
+    // Respond with success
+    return res
+      .status(200)
+      .json({ message: "SOS notifications sent successfully" });
+  } catch (err) {
+    console.error("Error in postSOS:", err.message);
+
+    // Ensure any file cleanup even on errors
+    if (req.files) {
+      await Promise.all(
+        req.files.map((att) => fs.unlink(att.path).catch(() => null))
+      );
+    }
+
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

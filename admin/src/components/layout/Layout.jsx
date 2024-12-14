@@ -5,6 +5,10 @@ import { Link, useLocation } from "react-router-dom";
 import { IoLogInOutline } from "react-icons/io5";
 import { MdNotificationsActive } from "react-icons/md";
 import { MdSpaceDashboard } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { LuNotebookPen } from "react-icons/lu";
+
 
 // Breadcrumb Component
 const Breadcrumb = () => {
@@ -45,6 +49,9 @@ const Layout = ({ children }) => {
   const [width, setWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(false);
   const [loading, setLoading] = useState(true);
+  const user = useSelector((state) => state.auth.user.admin)
+  console.log(user)
+
 
   const topBarTabs = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
@@ -52,6 +59,16 @@ const Layout = ({ children }) => {
       label: "Notifications",
       path: "notifications",
       icon: MdNotificationsActive,
+    },
+    {
+      label: "Admins",
+      path: "admin",
+      icon: MdAdminPanelSettings,
+    },
+    {
+      label: "Complaints",
+      path: "complaint",
+      icon: LuNotebookPen,
     },
   ];
 
@@ -91,7 +108,7 @@ const Layout = ({ children }) => {
         </div>
         <div className="flex items-center text-gray-700">
           <div className="tab cursor-pointer font-semibold mx-[20px] px-4 py-1 flex items-center rounded-full md:shadow-md md:border">
-            <div className="hidden mx-2 md:inline-block">{"guest@gmail.com"}</div>
+            <div className="hidden mx-2 md:inline-block">{ user?.username}</div>
           </div>
         </div>
       </div>

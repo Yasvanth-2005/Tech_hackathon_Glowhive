@@ -9,7 +9,11 @@ const adminModel = new mongoose.Schema({
     match: [/.+@.+\..+/, "Please enter a valid email address"],
   },
   password: { type: String, required: true },
-  role: { type: String, enum: [], required: true },
+  role: {
+    type: String,
+    enum: ["Warden", "AO", "DSW", "HOD"],
+    default: "Warden",
+  },
 });
 
 const Admin = mongoose.model("Admin", adminModel);

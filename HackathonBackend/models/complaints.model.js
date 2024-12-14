@@ -9,16 +9,11 @@ const ComplaintUserSchema = new mongoose.Schema(
     },
     statement: {
       type: String,
-      required: [true, "Statement is required"],
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
     },
-    category: {
-      type: String,
-      required: [true, "Category is required"],
-    },
+    category: { type: String },
     userId: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -31,6 +26,9 @@ const ComplaintUserSchema = new mongoose.Schema(
     },
     img: { type: String },
     video: { type: String },
+    isCritical: { type: Boolean, default: false },
+    location: { type: String },
+    time: { type: String },
   },
   {
     timestamps: true,

@@ -16,7 +16,7 @@ export const getAllSOSGlobal = async (req, res) => {
 };
 
 export const postSOSGlobal = async (req, res) => {
-  const { phno } = req.body;
+  const { phno, name, email } = req.body;
 
   try {
     const newGlobalSOS = await SOS.create({
@@ -45,13 +45,15 @@ export const postSOSGlobal = async (req, res) => {
 
 export const updateSOSGlobal = async (req, res) => {
   const { id } = req.params;
-  const { phno } = req.body;
+  const { phno, name, email } = req.body;
 
   try {
     const updatedGSOS = await SOS.findByIdAndUpdate(
       id,
       {
         phno,
+        name,
+        email,
       },
       { new: true }
     );

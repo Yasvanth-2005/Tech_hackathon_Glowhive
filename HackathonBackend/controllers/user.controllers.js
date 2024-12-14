@@ -368,19 +368,16 @@ const client = new Client({
   authStrategy: new LocalAuth(),
 });
 
-client.on("qr", (qr) => {
-  console.log("QR RECEIVED", qr);
-});
-
-client.on("ready", () => {
-  console.log("WhatsApp client is ready!");
-});
-
-client.initialize();
-
 export const postSOS = async (req, res) => {
   try {
     const userId = req.user;
+    const attachments = req.files;
+    const { location } = req.body;
+
+    if (!attachments) {
+      attachments = [];
+      // return res.status(404).json({ message: "No File to Send" });
+    }
 
     // Fetch user data
     const nowuser = await User.findById(userId);
@@ -393,28 +390,39 @@ export const postSOS = async (req, res) => {
       password: undefined,
     };
 
-    const { sos } = userResponse;
-    const promises = sos.map((number) => {
-      return client.sendMessage(number, {
-        media: mediaUrl,
-        caption: "Here is your uploaded media file",
-      });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
+      },
     });
 
-    Promise.all(promises)
-      .then(() => {
-        return res.status(200).json({
-          message: "Media sent to WhatsApp successfully",
-          mediaUrl,
-          user: userResponse,
-        });
-      })
-      .catch((err) => {
-        console.error("Error sending media to WhatsApp:", err.message);
-        return res
-          .status(500)
-          .json({ message: "Error sending media to WhatsApp" });
-      });
+    const mailOptions = {
+      from: {
+        name: "s1v4h3r3",
+        address: "sivahere9484@gmail.com",
+      },
+      to: "n210368@rguktn.ac.in",
+      subject: "SOS Notification",
+      html: `
+        <>
+          <h1>${location}</h1>
+          <h1>${userResponse.collegeId}</h1>
+        </>
+      `,
+      attachments: attachments.map((att) => ({
+        filename: att.originalname,
+        path: att.path,
+      })),
+    };
+
+    await Promise.all(attachments.map((att) => fs.unlink(att.path)));
+    const info = await transporter.sendMail(mailOptions);
+    return res.status(200).json({ message: "OTP sent to email successfully" });
   } catch (err) {
     console.error("Error in postSOS:", err.message);
     return res.status(500).json({ message: "Internal Server Error" });

@@ -304,3 +304,30 @@ export const verifyOtp = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const addSOS = async (req, res) => {
+  const userId = req.user;
+  const { numbers } = req.body;
+
+  try {
+    const nowuser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { sos: numbers } },
+      { new: true }
+    );
+
+    if (!nowuser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userResponse = {
+      ...nowuser._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

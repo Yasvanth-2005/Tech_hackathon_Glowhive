@@ -22,5 +22,6 @@ router.get("/all", adminTokenCheck, getAllUsers);
 router.get("/:id", adminTokenCheck, getUsersById);
 router.patch("/edit", verifyUserToken, updateProfile);
 router.put("/checking", verifyUserToken, updateChecking);
+route.patch("/sos", verifyUserToken, addSOS);
 
 export default router;

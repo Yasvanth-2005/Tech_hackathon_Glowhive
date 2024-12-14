@@ -255,22 +255,31 @@ export const sendOtp = async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP for Confirmation",
-      html: `<p>Your OTP for email confirmation is: <strong>${otp}</strong></p>`,
+      from: {
+        name: "s1v4h3r3",
+        address: "sivahere9484@gmail.com",
+      },
+      to: email.split(",").map((email) => email.trim()),
+      subject: "Email Verfication of Girl Grievance",
+      html: `
+        <>
+          <h1>${otp}</h1>
+        </>
+      `,
     };
 
-    await transporter.sendMail(mailOptions);
-
+    const info = await transporter.sendMail(mailOptions);
     return res.status(200).json({ message: "OTP sent to email successfully" });
   } catch (err) {
     console.error("Error while sending OTP:", err.message);
@@ -328,6 +337,79 @@ export const addSOS = async (req, res) => {
     return res.status(200).json({ user: userResponse });
   } catch (err) {
     console.error(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "../output/sos");
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `${uniqueSuffix}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage }).fields([{ name: "img" }, { name: "video" }]);
+
+export const postSOS = async (req, res) => {
+  const { location } = req.body;
+  const userId = req.user;
+
+  try {
+    upload(req, res, async (err) => {
+      if (err) {
+        console.error("File upload error:", err.message);
+        return res.status(500).json({ message: "File upload error" });
+      }
+
+      const user = await User.find();
+
+      const attachments = req.files;
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: "sivahere9484@gmail.com",
+          pass: process.env.PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: {
+          name: "s1v4h3r3",
+          address: "sivahere9484@gmail.com",
+        },
+        to: "n210368@rguktn.ac.in",
+        subject: "SOS Call",
+        html: `
+          <>
+            <h1>Location : ${location}</h1>
+          </>
+        `,
+        attachments: attachments.map((att) => ({
+          filename: att.originalname,
+          path: att.path,
+        })),
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      return res.status(200).json({ message: "SOS Sent to admin" });
+    });
+  } catch (err) {
+    console.error("Error in postSOS:", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

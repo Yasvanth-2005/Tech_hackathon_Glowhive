@@ -1,15 +1,8 @@
 import mongoose from "mongoose";
 
-const SOSModel = new mongoose.Schema({
-  video: { type: String, unique: true, required: true },
-  audio: { type: String, required: true },
-  location: { type: String, required: true },
-  userId: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-    default: null,
-  },
+const SosGlobalSchema = new mongoose.Schema({
+  phno: { type: String, required: [true, "Phone Number is required"] },
 });
 
-const SOS = mongoose.model("SOS", SOSModel);
+const SOS = mongoose.model("SOS", SosGlobalSchema);
 export default SOS;

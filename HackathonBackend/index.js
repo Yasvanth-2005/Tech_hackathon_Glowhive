@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.route.js";
 import complaintsRoutes from "./routes/complaints.route.js";
 import notificationRoutes from "./routes/notifications.route.js";
 import supportRoutes from "./routes/support.route.js";
+import sosRoutes from "./routes/sos.route.js";
 
 // Middleware
 dotenv.config();
@@ -52,7 +53,7 @@ app.use((req, res, next) => {
 });
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL || "http://localhost:8080",
+  origin: process.env.CLIENT_URL || "*",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -90,6 +91,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/complaints", complaintsRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/support", supportRoutes);
+app.use("/api/sos", sosRoutes);
 
 // 404 Error Handler
 app.use((req, res, next) => {

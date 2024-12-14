@@ -62,7 +62,6 @@ const SOS = () => {
                 <th className="border border-gray-300 px-4 py-2">Name</th>
                 <th className="border border-gray-300 px-4 py-2">Email</th>
                 <th className="border border-gray-300 px-4 py-2">Phone Number</th>
-                <th className="border border-gray-300 px-4 py-2">Created At</th>
               </tr>
             </thead>
             <tbody>
@@ -71,9 +70,6 @@ const SOS = () => {
                   <td className="border border-gray-300 px-4 py-2">{item.name}</td>
                   <td className="border border-gray-300 px-4 py-2">{item.email}</td>
                   <td className="border border-gray-300 px-4 py-2">{item.phno}</td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </td>
                 </tr>
               ))}
             </tbody>

@@ -49,6 +49,7 @@ const Complaint = () => {
   const filteredComplaints = data?.complaints?.filter(
     (item) =>
       item.typeOfComplaint?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (new Date(item.createdAt).toLocaleString())?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.userId?.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -140,7 +141,6 @@ const Complaint = () => {
               <td className="ps-3">Type</td>
               <td className="ps-3">Category</td>
               <td className="ps-3">Date</td>
-              <td className="ps-3">From</td>
               <td className="ps-3">Status</td>
               <td className="ps-3">Actions</td>
             </tr>
@@ -156,7 +156,6 @@ const Complaint = () => {
                   <td className="ps-3 py-2">
                     {new Date(item.createdAt).toLocaleString()}
                   </td>
-                  <td className="ps-3 py-2">{item.userId?.username}</td>
                   <td className="ps-3 py-2">
                     <span
                       className={`${statusStyle(item.status)} font-bold px-2 py-1 border rounded-lg shadow`}

@@ -4,8 +4,10 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { FaSearch, FaEdit, FaTrashAlt, FaEye } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Notifications = () => {
+  const navigate = useNavigate()
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,7 +59,9 @@ const Notifications = () => {
   const filteredNotifications = data?.filter(
     (item) =>
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.sender?.username.toLowerCase().includes(searchQuery.toLowerCase())
+    item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.sender?.username.toLowerCase().includes(searchQuery.toLowerCase()) 
+      
   );
 
   // Handle view notification
@@ -146,6 +150,7 @@ const Notifications = () => {
             <FaSearch className="absolute right-0 text-[15px] top-[0px] text-gray-500 m-4" />
           </div>
         </div>
+        <button className="bg-purple-600 px-3 py-2 rounded-md text-white m-2 font-bold" onClick={() => navigate("/notifications/create")}>+Add</button>
       </div>
 
       <div className="w-full overflow-x-auto">

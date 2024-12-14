@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:girls_grivince/Home/home.dart';
-import 'package:girls_grivince/Login/login.dart';
 import 'package:girls_grivince/Login/loginMain.dart';
-import 'package:girls_grivince/m.dart';
-import 'package:girls_grivince/Login/password.dart';
-import 'package:girls_grivince/Login/signup.dart';
-import 'package:girls_grivince/Login/signup.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: Home(),
+      home: Loginmain(),
     );
   }
 }

@@ -28,15 +28,13 @@ export const sendComplaint = async (req, res) => {
         .json({ message: "File upload failed", error: err });
     }
 
-    const finalUserId = userId?.trim() ? userId : null;
-
     const user = req.user;
     const {
       typeOfComplaint,
       statement,
       description,
       category,
-      userId: finalUserId,
+      userId,
       isCritical,
       location,
       time,
@@ -48,13 +46,15 @@ export const sendComplaint = async (req, res) => {
     const img = req.files?.img?.[0]?.path || null;
     const video = req.files?.video?.[0]?.path || null;
 
+    const finalUserId = userId?.trim() ? userId : null;
+
     try {
       const complaint = await Complaints.create({
         typeOfComplaint,
         statement,
         description,
         category,
-        userId,
+        userId: finalUserId,
         img,
         video,
         isCritical,

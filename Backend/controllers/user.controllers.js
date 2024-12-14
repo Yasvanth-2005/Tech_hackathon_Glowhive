@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-import SOS from "../models/sos.model.js";
+import SOS from "../models/sosMembers.model.js";
 import Otp from "../models/otp.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

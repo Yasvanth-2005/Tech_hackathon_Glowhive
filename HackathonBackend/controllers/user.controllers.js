@@ -372,7 +372,15 @@ export const postSOS = async (req, res) => {
         return res.status(500).json({ message: "File upload error" });
       }
 
-      const user = await User.find();
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userResponse = {
+        ...user._doc,
+        password: undefined,
+      };
 
       const attachments = req.files;
 
@@ -397,6 +405,7 @@ export const postSOS = async (req, res) => {
         html: `
           <>
             <h1>Location : ${location}</h1>
+            <p>${userResponse.username}</p>
           </>
         `,
         attachments: attachments.map((att) => ({

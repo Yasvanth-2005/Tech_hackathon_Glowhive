@@ -52,12 +52,12 @@ app.use((req, res, next) => {
   next();
 });
 
-const corsOptions = {
-  origin: process.env.CLIENT_URL || "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: process.env.CLIENT_URL || "*",
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// };
+app.use(cors());
 
 // Environment Validation
 const requiredEnvVars = ["MONGODB_URI", "PORT", "BACKEND_URL"];

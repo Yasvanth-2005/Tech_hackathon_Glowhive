@@ -341,82 +341,80 @@ export const addSOS = async (req, res) => {
   }
 };
 
-import multer from "multer";
-import path from "path";
-import fs from "fs";
+// import multer from "multer";
+// import path from "path";
+// import fs from "fs";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, "../output/sos");
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, `${uniqueSuffix}-${file.originalname}`);
-  },
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     const uploadPath = path.join(__dirname, "../output/sos");
+//     if (!fs.existsSync(uploadPath)) {
+//       fs.mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     cb(null, `${uniqueSuffix}-${file.originalname}`);
+//   },
+// });
+
+// const upload = multer({ storage }).fields([{ name: "img" }, { name: "video" }]);
+
+import pkg from "whatsapp-web.js";
+const { Client, LocalAuth } = pkg;
+
+const client = new Client({
+  authStrategy: new LocalAuth(),
 });
 
-const upload = multer({ storage }).fields([{ name: "img" }, { name: "video" }]);
+client.on("qr", (qr) => {
+  console.log("QR RECEIVED", qr);
+});
+
+client.on("ready", () => {
+  console.log("WhatsApp client is ready!");
+});
+
+client.initialize();
 
 export const postSOS = async (req, res) => {
-  const { location } = req.body;
-  const userId = req.user;
-
   try {
-    upload(req, res, async (err) => {
-      if (err) {
-        console.error("File upload error:", err.message);
-        return res.status(500).json({ message: "File upload error" });
-      }
+    const userId = req.user;
 
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+    // Fetch user data
+    const nowuser = await User.findById(userId);
+    if (!nowuser) {
+      return res.status(500).json({ message: "User not found" });
+    }
 
-      const userResponse = {
-        ...user._doc,
-        password: undefined,
-      };
+    const userResponse = {
+      ...nowuser._doc,
+      password: undefined,
+    };
 
-      const attachments = req.files;
-
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: "sivahere9484@gmail.com",
-          pass: process.env.PASSWORD,
-        },
+    const { sos } = userResponse;
+    const promises = sos.map((number) => {
+      return client.sendMessage(number, {
+        media: mediaUrl,
+        caption: "Here is your uploaded media file",
       });
-
-      const mailOptions = {
-        from: {
-          name: "s1v4h3r3",
-          address: "sivahere9484@gmail.com",
-        },
-        to: "n210368@rguktn.ac.in",
-        subject: "SOS Call",
-        html: `
-          <>
-            <h1>Location : ${location}</h1>
-            <p>${userResponse.username}</p>
-          </>
-        `,
-        attachments: attachments.map((att) => ({
-          filename: att.originalname,
-          path: att.path,
-        })),
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      return res.status(200).json({ message: "SOS Sent to admin" });
     });
+
+    Promise.all(promises)
+      .then(() => {
+        return res.status(200).json({
+          message: "Media sent to WhatsApp successfully",
+          mediaUrl,
+          user: userResponse,
+        });
+      })
+      .catch((err) => {
+        console.error("Error sending media to WhatsApp:", err.message);
+        return res
+          .status(500)
+          .json({ message: "Error sending media to WhatsApp" });
+      });
   } catch (err) {
     console.error("Error in postSOS:", err.message);
     return res.status(500).json({ message: "Internal Server Error" });

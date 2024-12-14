@@ -406,13 +406,15 @@ export const postSOS = async (req, res) => {
         to: recipient.email,
         subject: "🚨 SOS Notification 🚨",
         html: `
-          <div>
-            <h2>SOS Alert</h2>
-            <p><strong>Location:</strong> ${location}</p>
-            <p><strong>Sender:</strong> ${userResponse.collegeId}</p>
-            <p><strong>Name:</strong> ${userResponse.username}</p>
-            <p><strong>Email:</strong> ${userResponse.email}</p>
-          </div>
+          <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
+          <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
+          <h5 style="text-align:center">Dear Authority,</h5>
+          <p style="text-align:center">The app recognizes that one of your User in Threat Situation.  </p>
+          <pre style="text-align:center">
+          Name of User: ${userResponse.username}
+          Contact Information: +91 ${userResponse.phno}
+          Location: ${userResponse.location}
+          </pre>
         `,
         attachments: attachments.map((att) => ({
           filename: att.originalname,

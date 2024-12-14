@@ -47,7 +47,7 @@ Framework/Library: Flutter
 UI/UX Design: Figma or Adobe XD (for designing app layouts and user flows)
 State Management: Redux or Context API
 
-[https://admin-glowhive.netlify.app/](https://admin-glowhive.netlify.app/)
+[https://admin-glowhive.netlify.app/](https://moonlit-haupia-6ff9d6.netlify.app/)
 
 ## Backend
 Server Framework: Node.js with Express.js (for handling APIs and business logic)
@@ -56,6 +56,11 @@ MongoDB (NoSQL database for complaint and user data)
 Authentication:  JWT (JSON Web Token)
 
 [https://glowhive-hackthon.onrender.com/api/]( https://glowhive-hackthon.onrender.com/api/)
+
+## Postman Api link
+
+[https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/collection/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4?action=share&creator=40295472&active-environment=40295472-68c052f1-471a-46c9-b396-2d1455ab5631](https://personal-7797.postman.co/workspace/Yasvanth's-Public~bb5e14a1-c352-4798-9158-20eb9e952c65/collection/29852891-e3a2ba42-f3ce-49b4-af10-0f5e8b00c4f4?action=share&creator=40295472&active-environment=40295472-68c052f1-471a-46c9-b396-2d1455ab5631)
+
 
 ## Hosting
 Cloud Provider:
@@ -149,8 +154,35 @@ Git for version control.
 ## Testing and Debugging
 Use React Developer Tools to debug UI components.
 Use Postman to test API endpoints.
+
+# Future Implementations
+
+## Triple Click Functionality
+A Triple-Click Functionality triggers specific actions when a user taps three times consecutively on a UI element. It can enhance accessibility (e.g., activating voice assistance), provide quick shortcuts (e.g., opening hidden settings), or handle emergencies (e.g., sending an SOS).
+
+### Implementation involves:
+
+Detecting three clicks within a set time (e.g., 500ms).
+Linking it to desired actions like activating features or shortcuts.
+
+## Mobile WhatsApp/message sending instead of email:
+To implement WhatsApp/message sending instead of email in a mobile app, users can be directed to WhatsApp with a pre-filled message. However, there are no free software solutions currently available for sending WhatsApp messages directly from third-party apps due to WhatsApp’s strict API usage policies.
+
+## Integration of parents/friends in sos
+The SOS feature in your app can send distress signals to parents and friends by allowing users to add them as emergency contacts. When activated, the app sends a message with the user’s location to these contacts via SMS, WhatsApp, or email. It can include real-time location updates and provide a silent mode for discretion. Additionally, contacts can confirm they received the alert and offer assistance.
+
+## Filtering vulgar/inappropriate complanints using any ML model to prevent unneccesary complaints:
+To filter vulgar or inappropriate complaints using Machine Learning (ML):
+
+Data Collection: Gather labeled complaint data (appropriate vs. inappropriate).
+Preprocessing: Clean the text (remove stop words, tokenize, lowercase).
+Model Selection: Use models like SVM, RNNs, or BERT for text classification.
+Training: Train the model on labeled data to detect inappropriate content.
+Filtering: Classify incoming complaints and flag inappropriate ones for review.
+Libraries like scikit-learn, TensorFlow, or PyTorch can help, and the model should be regularly updated for accuracy
+
 # Team Details
-1)Yasvanth-N210368
-2)Mohan-N210770
-3)Sri babu-N210522
+1)Yasvanth-N210368<br>
+2)Mohan-N210770<br>
+3)Sri babu-N210522<br>
 4)Nakshatra-N210615

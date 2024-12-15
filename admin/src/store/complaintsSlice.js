@@ -6,15 +6,15 @@ export const fetchComplaints = createAsyncThunk(
   'complaints/fetchComplaints',
   async (token, { rejectWithValue }) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL; 
+      const apiUrl = import.meta.env.VITE_API_URL; // URL from environment variable
       const response = await axios.get(`${apiUrl}/complaints/admin`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Attach the token to request headers
         },
       });
-      return response.data; // return the data on success
+      return response.data; // Return fetched data
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch complaints'); // return error message on failure
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch complaints'); // Handle error
     }
   }
 );
@@ -22,23 +22,23 @@ export const fetchComplaints = createAsyncThunk(
 const complaintsSlice = createSlice({
   name: 'complaints',
   initialState: {
-    complaints: [],
-    loading: false,
-    error: null,
+    complaints: [], // Store complaints
+    loading: false, // Loading state
+    error: null, // Error state
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchComplaints.pending, (state) => {
         state.loading = true; // Start loading
-        state.error = null; // Clear any previous error
+        state.error = null; // Clear any previous errors
       })
       .addCase(fetchComplaints.fulfilled, (state, action) => {
-        state.loading = false;
-        state.complaints = action.payload; // Store fetched data
+        state.loading = false; // Stop loading
+        state.complaints = action.payload; // Store the fetched complaints data
       })
       .addCase(fetchComplaints.rejected, (state, action) => {
-        state.loading = false;
+        state.loading = false; // Stop loading
         state.error = action.payload; // Store error message
       });
   },

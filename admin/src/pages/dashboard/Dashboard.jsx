@@ -63,7 +63,7 @@ const Dashboard = () => {
                 Total <br className="sm:hidden" /> Users
               </h2>
               <h2 className="registrations-count text-4xl font-semibold text-purple-800">
-                0
+                10
               </h2>
             </div>
             <div className="fromcampus p-4 border border-purple-200 text-black rounded-lg shadow-lg bg-white">
@@ -71,7 +71,7 @@ const Dashboard = () => {
                 Total <br className="sm:hidden" /> Complaints
               </h2>
               <h2 className="registrations-count text-4xl font-semibold text-purple-800">
-                0
+                20
               </h2>
             </div>
             <div className="offcampus p-4 border border-purple-200 text-black rounded-lg shadow-lg bg-white">
@@ -79,7 +79,7 @@ const Dashboard = () => {
                 Pending <br className="sm:hidden" /> Complaints
               </h2>
               <h2 className="registrations-count text-4xl font-semibold text-purple-800">
-                0
+                12
               </h2>
             </div>
             <div className="received-money border border-purple-200 p-4 text-black rounded-lg shadow-lg bg-white">
@@ -87,7 +87,7 @@ const Dashboard = () => {
                 Solved <br className="sm:hidden" /> Complaints
               </h2>
               <h2 className="total-money text-4xl font-semibold text-purple-800">
-                0
+                8
               </h2>
             </div>
           </div>

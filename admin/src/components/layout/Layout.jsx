@@ -9,9 +9,10 @@ import { useSelector } from "react-redux";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { LuNotebookPen } from "react-icons/lu";
 import { FaPersonBreastfeeding } from "react-icons/fa6";
-
-
-
+import { signOut } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {toast} from "react-hot-toast";
 // Breadcrumb Component
 const Breadcrumb = () => {
   const location = useLocation();
@@ -48,12 +49,13 @@ const Breadcrumb = () => {
 };
 
 const Layout = ({ children }) => {
+  const dispatch = useDispatch()
   const [width, setWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(false);
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state) => state.auth.user.admin)
-  console.log(user)
-
+  const user = useSelector((state) => state.auth.user.admin);
+  const navigate = useNavigate();
+  console.log(user);
 
   const topBarTabs = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
@@ -101,7 +103,6 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener("resize", handleWidth);
   }, []);
 
-
   return (
     <>
       {/* Header */}
@@ -120,7 +121,7 @@ const Layout = ({ children }) => {
         </div>
         <div className="flex items-center text-gray-700">
           <div className="tab cursor-pointer font-semibold mx-[20px] px-4 py-1 flex items-center rounded-full md:shadow-md md:border">
-            <div className="hidden mx-2 md:inline-block">{ user?.username}</div>
+            <div className="hidden mx-2 md:inline-block">{user?.username}</div>
           </div>
         </div>
       </div>
@@ -156,7 +157,9 @@ const Layout = ({ children }) => {
           <button
             className="w-[90%] py-2 mx-auto bg-purple-600 font-bold text-white rounded-md flex items-center justify-center gap-2 mt-10"
             onClick={() => {
-              window.location.reload();
+              dispatch(signOut());
+              toast.success("logout successful")
+              navigate("/");
             }}
           >
             Logout
@@ -183,7 +186,15 @@ const Layout = ({ children }) => {
               <span>{item.label}</span>
             </Link>
           ))}
-          <button className="w-[90%] py-2 mx-auto bg-purple-600 text-white rounded-md flex items-center justify-center gap-2 mt-10">
+          <button
+            onClick={() => {
+
+              dispatch(signOut());
+              toast.success("logout successful")
+              navigate("/");
+            }}
+            className="w-[90%] py-2 mx-auto bg-purple-600 text-white rounded-md flex items-center justify-center gap-2 mt-10"
+          >
             Logout
             <IoLogInOutline />
           </button>

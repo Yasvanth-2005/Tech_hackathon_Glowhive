@@ -28,7 +28,6 @@ export const sendComplaint = async (req, res) => {
         .json({ message: "File upload failed", error: err });
     }
 
-    const user = req.user;
     const {
       typeOfComplaint,
       statement,
@@ -69,9 +68,15 @@ export const sendComplaint = async (req, res) => {
         return res.status(404).json({ message: "Posting Complaint Failed" });
       }
 
-      await User.findByIdAndUpdate(user, {
-        $push: { complaints: complaint._id },
-      });
+      console.log(req.user);
+      const user = await User.findById(req.user);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      console.log(user);
+
+      user.complaints.push(complaint._id);
+      await user.save();
 
       return res.status(200).json({
         message: "New Complaint Sent Successfully",

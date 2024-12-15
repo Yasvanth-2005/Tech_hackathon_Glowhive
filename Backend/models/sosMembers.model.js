@@ -6,5 +6,5 @@ const SosGlobalSchema = new mongoose.Schema({
   email: { type: String, required: [true, "Email is required"] },
 });
 
-const SOS = mongoose.model("SOS", SosGlobalSchema);
+const SOS = mongoose.model("SOSNumbers", SosGlobalSchema);
 export default SOS;

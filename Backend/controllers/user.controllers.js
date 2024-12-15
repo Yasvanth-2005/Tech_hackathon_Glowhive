@@ -486,7 +486,7 @@ export const postSOS = async (req, res) => {
       },
     });
 
-    const googleMapsLink = `https://www.google.com/maps?q=${lat},${long}`;
+    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
 
     // Send email to the specified recipient
     await transporter.sendMail({

@@ -215,14 +215,17 @@ export const getUserComplaintDetails = async (req, res) => {
   const userId = req.user;
 
   try {
-    const userComplaints = await Complaints.find({ userId });
-    if (!userComplaints) {
+    // Find the user and populate their complaints
+    const user = await User.findById(userId).populate("complaints");
+
+    if (!user) {
       return res.status(404).json({ message: "User Not Found" });
     }
 
-    return res.status(200).json({ complaints: userComplaints });
+    // Return all complaints associated with the user
+    return res.status(200).json({ complaints: user.complaints });
   } catch (err) {
     console.log(err.message);
-    return res.status(500).json({ messgae: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };

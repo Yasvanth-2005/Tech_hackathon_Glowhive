@@ -458,6 +458,7 @@ export const postSOS = async (req, res) => {
     let attachments = req.files || [];
     const { location } = req.body;
 
+    // Validate location
     if (!Array.isArray(location) || location.length !== 2) {
       return res
         .status(400)
@@ -465,6 +466,7 @@ export const postSOS = async (req, res) => {
     }
     const [lat, long] = location;
 
+    // Fetch the user
     const nowuser = await User.findById(userId);
     if (!nowuser) {
       return res.status(404).json({ message: "User not found" });
@@ -472,9 +474,18 @@ export const postSOS = async (req, res) => {
 
     const userResponse = {
       ...nowuser._doc,
-      password: undefined,
+      password: undefined, // Mask sensitive information
     };
 
+    // Fetch SOS recipient emails
+    const sosNumbers = await SOS.find();
+    if (!sosNumbers.length) {
+      return res
+        .status(404)
+        .json({ message: "No SOS recipients found in the database." });
+    }
+
+    // Create nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
@@ -488,31 +499,36 @@ export const postSOS = async (req, res) => {
 
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
 
-    // Send email to the specified recipient
-    await transporter.sendMail({
-      from: {
-        name: "SOS Alert",
-        address: "sivahere9484@gmail.com",
-      },
-      to: "yasvanthhanumantu1@gmail.com",
-      subject: "🚨 SOS Notification 🚨",
-      html: `
-        <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
-        <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
-        <h5 style="text-align:center">Dear Authority,</h5>
-        <p style="text-align:center">The app recognizes that one of your Users is in a Threat Situation.</p>
-        <pre style="text-align:center">
-          Name of User: ${userResponse.username}
-          Contact Information: +91 ${userResponse.phno}
-          Location Coordinates: [${lat}, ${long}]
-          <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
-        </pre>
-      `,
-      attachments: attachments.map((att) => ({
-        filename: att.originalname,
-        path: att.path,
-      })),
-    });
+    // Prepare email promises for all recipients
+    const emailPromises = sosNumbers.map((recipient) =>
+      transporter.sendMail({
+        from: {
+          name: "SOS Alert",
+          address: "sivahere9484@gmail.com",
+        },
+        to: recipient.email,
+        subject: "🚨 SOS Notification 🚨",
+        html: `
+          <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
+          <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
+          <h5 style="text-align:center">Dear ${recipient.name},</h5>
+          <p style="text-align:center">The app recognizes that one of your Users is in a Threat Situation.</p>
+          <pre style="text-align:center">
+            Name of User: ${userResponse.username}
+            Contact Information: +91 ${userResponse.phno}
+            Location Coordinates: [${lat}, ${long}]
+            <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
+          </pre>
+        `,
+        attachments: attachments.map((att) => ({
+          filename: att.originalname,
+          path: att.path,
+        })),
+      })
+    );
+
+    // Send emails to all recipients
+    await Promise.all(emailPromises);
 
     // Clean up uploaded files
     await Promise.all(attachments.map((att) => fs.unlink(att.path)));
@@ -520,7 +536,7 @@ export const postSOS = async (req, res) => {
     // Respond with success
     return res
       .status(200)
-      .json({ message: "SOS notification sent successfully" });
+      .json({ message: "SOS notifications sent successfully." });
   } catch (err) {
     console.error("Error in postSOS:", err.message);
 

@@ -169,12 +169,11 @@ const Complaint = () => {
                       {item.status}
                     </span>
                   </td>
-                  <td className="ps-3 py-2 flex items-center gap-2">
-                    <FaEye
-                      className="text-blue-600 text-[20px] mx-2 cursor-pointer"
+                  <td className="ps-3 py-2 flex  items-center gap-2">
+                    <div
+                      className="bg-purple-200 text-purple-800 px-2 py-1 rounded-md text-left text-[20px] mx-2 cursor-pointer"
                       onClick={() => handleView(item._id)}
-                    />
-                    <FaTrashAlt className="text-red-600 text-[20px] mx-2 cursor-pointer" />
+                    >View</div>
                   </td>
                 </tr>
               ))

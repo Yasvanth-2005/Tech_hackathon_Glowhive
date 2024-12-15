@@ -2,8 +2,8 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import authReducer from './authSlice'; // Import your auth reducer
-import complaintsReducer from './complaintsSlice'; // Import complaints reducer
-
+import complaintReducer from './complaintsSlice'
+import usersReducer from './userSlice'
 // Persist config for auth slice
 const persistConfig = {
   key: 'auth', // Persist only the auth slice
@@ -14,7 +14,7 @@ const persistConfig = {
 // Combine reducers, adding the auth and complaints reducers
 const rootReducer = combineReducers({
   auth: persistReducer(persistConfig, authReducer), // Persist only auth reducer
-  complaints: complaintsReducer, // Add complaints reducer to the root
+
 });
 
 const store = configureStore({

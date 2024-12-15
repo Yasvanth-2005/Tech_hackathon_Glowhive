@@ -180,10 +180,10 @@ const Notifications = () => {
                       className="text-blue-600 text-[20px] mx-2 cursor-pointer"
                       onClick={() => handleView(item._id)}
                     />
-                    <FaEdit
+                    {/* <FaEdit
                       className="text-yellow-600 text-[20px] mx-2 cursor-pointer"
                       onClick={() => handleEdit(item._id)}
-                    />
+                    /> */}
                     <FaTrashAlt
                       className="text-red-600 text-[20px] mx-2 cursor-pointer"
                       onClick={() => handleDelete(item._id)}

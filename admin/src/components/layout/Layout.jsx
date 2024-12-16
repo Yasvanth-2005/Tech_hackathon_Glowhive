@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { HiOutlineViewList } from "react-icons/hi";
 import { VscChromeClose } from "react-icons/vsc";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoLogInOutline } from "react-icons/io5";
-import { MdNotificationsActive } from "react-icons/md";
-import { MdSpaceDashboard } from "react-icons/md";
-import { useSelector } from "react-redux";
-import { MdAdminPanelSettings } from "react-icons/md";
+import {
+  MdNotificationsActive,
+  MdSpaceDashboard,
+  MdAdminPanelSettings,
+} from "react-icons/md";
 import { LuNotebookPen } from "react-icons/lu";
 import { FaPersonBreastfeeding } from "react-icons/fa6";
+import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../store/authSlice";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import {toast} from "react-hot-toast";
+import { toast } from "react-hot-toast";
+
 // Breadcrumb Component
 const Breadcrumb = () => {
   const location = useLocation();
@@ -29,7 +30,7 @@ const Breadcrumb = () => {
             <li key={index} className="flex items-center space-x-2">
               <span>/</span>
               {isLast ? (
-                <span className=" text-lg font-semibold text-purple-600 capitalize">
+                <span className="text-lg font-semibold text-purple-600 capitalize">
                   {segment}
                 </span>
               ) : (
@@ -49,13 +50,12 @@ const Breadcrumb = () => {
 };
 
 const Layout = ({ children }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [width, setWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const user = useSelector((state) => state.auth.user.admin);
+  const user = useSelector((state) => state.auth.user?.admin);
   const navigate = useNavigate();
-  console.log(user);
+  const location = useLocation();
 
   const topBarTabs = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
@@ -64,40 +64,20 @@ const Layout = ({ children }) => {
       path: "notifications",
       icon: MdNotificationsActive,
     },
-    {
-      label: "Admins",
-      path: "admin",
-      icon: MdAdminPanelSettings,
-    },
-    {
-      label: "Complaints",
-      path: "complaint",
-      icon: LuNotebookPen,
-    },
-    {
-      label: "Support",
-      path: "support",
-      icon: FaPersonBreastfeeding,
-    },
-    {
-      label: "SOS",
-      path: "sos",
-      icon: FaPersonBreastfeeding,
-    },
+    { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
+    { label: "Complaints", path: "complaint", icon: LuNotebookPen },
+    { label: "Support", path: "support", icon: FaPersonBreastfeeding },
+    { label: "SOS", path: "sos", icon: FaPersonBreastfeeding },
   ];
 
-  const location = useLocation();
-
-  // Utility function to check active tab
   const isActive = (path) => location.pathname.includes(path);
 
-  // Handle responsive sidebar toggle
   const handleWidth = () => {
-    setWidth(window.innerWidth);
-    setShowSidebar(window.innerWidth < 768);
+    const newWidth = window.innerWidth;
+    setWidth(newWidth);
+    if (newWidth >= 768) setShowSidebar(false); // Close sidebar for desktop view
   };
 
-  // Add event listener for window resize
   useEffect(() => {
     window.addEventListener("resize", handleWidth);
     return () => window.removeEventListener("resize", handleWidth);
@@ -116,7 +96,7 @@ const Layout = ({ children }) => {
             to="/"
             className="logo font-semibold text-purple-600 select-none px-3 text-2xl"
           >
-            Girl Grievence
+            Girl Grievance
           </Link>
         </div>
         <div className="flex items-center text-gray-700">
@@ -135,7 +115,7 @@ const Layout = ({ children }) => {
         <div className="w-full flex items-center justify-end p-3">
           <VscChromeClose
             className="text-[30px] cursor-pointer"
-            onClick={() => setShowSidebar(!showSidebar)}
+            onClick={() => setShowSidebar(false)}
           />
         </div>
         <div className="flex flex-col md:gap-4">
@@ -158,7 +138,7 @@ const Layout = ({ children }) => {
             className="w-[90%] py-2 mx-auto bg-purple-600 font-bold text-white rounded-md flex items-center justify-center gap-2 mt-10"
             onClick={() => {
               dispatch(signOut());
-              toast.success("logout successful")
+              toast.success("Logout successful");
               navigate("/");
             }}
           >
@@ -188,9 +168,8 @@ const Layout = ({ children }) => {
           ))}
           <button
             onClick={() => {
-
               dispatch(signOut());
-              toast.success("logout successful")
+              toast.success("Logout successful");
               navigate("/");
             }}
             className="w-[90%] py-2 mx-auto bg-purple-600 text-white rounded-md flex items-center justify-center gap-2 mt-10"

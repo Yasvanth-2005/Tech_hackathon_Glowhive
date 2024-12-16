@@ -43,8 +43,8 @@ const SOS = () => {
   return (
     <Layout>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="w-full flex items-center justify-between flex-wrap">
-        <h1 className="text-2xl font-bold">SOS List</h1>
+      <div className="w-full flex flex-wrap items-center justify-between">
+        <h1 className="text-2xl font-bold mb-4 md:mb-0">SOS List</h1>
         <button
           className="mx-2 rounded-md bg-purple-600 text-white px-3 py-2 font-bold"
           onClick={() => navigate("/SOS/new")}
@@ -56,24 +56,32 @@ const SOS = () => {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : sosData?.globalSOS?.length > 0 ? (
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2">Name</th>
-                <th className="border border-gray-300 px-4 py-2">Email</th>
-                <th className="border border-gray-300 px-4 py-2">Phone Number</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sosData?.globalSOS?.map((item, index) => (
-                <tr key={index} className="text-center">
-                  <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                  <td className="border border-gray-300 px-4 py-2">{item.email}</td>
-                  <td className="border border-gray-300 px-4 py-2">{item.phno}</td>
+          <div className="overflow-x-auto">
+            {/* Responsive table container */}
+            <table className="table-auto w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-purple-600 text-white font-bold">
+                  <th className="px-4  text-nowrap py-2 text-left">Sno</th>
+                  <th className="px-4  text-nowrap py-2 text-left">Name</th>
+                  <th className="px-4  text-nowrap py-2 text-left">Email</th>
+                  <th className="px-4  text-nowrap py-2 text-left">Phone Number</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sosData?.globalSOS?.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="text-center border border-gray-300"
+                  >
+                    <td className="px-4  text-nowrap py-2 text-left">{index + 1}</td>
+                    <td className="px-4  text-nowrap py-2 text-left">{item.name}</td>
+                    <td className="px-4  text-nowrap py-2 text-left">{item.email}</td>
+                    <td className="px-4  text-nowrap py-2 text-left">{item.phno}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="text-center">No SOS data available.</div>
         )}

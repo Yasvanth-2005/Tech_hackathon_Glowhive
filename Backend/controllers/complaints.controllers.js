@@ -171,10 +171,9 @@ export const getAllComplaints = async (req, res) => {
       };
     }
 
-    const complaints = await Complaints.find(filter).populate(
-      "userId",
-      "email username phno collegeId"
-    );
+    const complaints = await Complaints.find(filter)
+      .populate("userId", "email username phno collegeId")
+      .sort({ createdAt: -1 });
 
     if (!complaints.length) {
       return res
@@ -216,7 +215,9 @@ export const getUserComplaintDetails = async (req, res) => {
 
   try {
     // Find the user and populate their complaints
-    const user = await User.findById(userId).populate("complaints");
+    const user = await User.findById(userId)
+      .populate("complaints")
+      .sort({ createdAt: -1 });
 
     if (!user) {
       return res.status(404).json({ message: "User Not Found" });

@@ -1,4 +1,5 @@
 import SOS from "../models/sosMembers.model.js";
+import User from "../models/user.model.js";
 
 export const getAllSOSGlobal = async (req, res) => {
   try {
@@ -11,6 +12,35 @@ export const getAllSOSGlobal = async (req, res) => {
     return res.status(200).json({ globalSOS: allsos });
   } catch (error) {
     console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getUserSOS = async (req, res) => {
+  const user = req.user;
+
+  try {
+    const globalSOS = await SOS.find();
+    const globalData = globalSOS.map((sos) => ({
+      ...sos._doc,
+      type: "global",
+    }));
+
+    const userDetails = await User.findById(user);
+    if (!userDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userSOS = userDetails.sos || [];
+    const userData = userSOS.map((sos) => ({
+      ...sos,
+      type: "user",
+    }));
+
+    const combinedSOS = [...globalData, ...userData];
+    return res.status(200).json({ sos: combinedSOS });
+  } catch (e) {
+    console.error(e.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

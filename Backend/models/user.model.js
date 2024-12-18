@@ -23,7 +23,21 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     sos: {
-      type: [{ type: String }],
+      type: [
+        {
+          name: { type: String, required: true },
+          phno: {
+            type: String,
+            required: true,
+            match: [/^\d{10}$/, "Phone number must be 10 digits"],
+          },
+          email: {
+            type: String,
+            required: true,
+            match: [/.+@.+\..+/, "Please enter a valid email address"],
+          },
+        },
+      ],
       default: [],
     },
     complaints: {

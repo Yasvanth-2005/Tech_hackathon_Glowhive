@@ -230,21 +230,22 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const updateUsername = async (req,res) => {
+export const updateUsername = async (req, res) => {
   const user = req.user;
+  const { username } = req.body;
 
   try {
-    const editUser = await User.findByIdAndUpdate(user,{username})
-    if(!editUser){
-      return res.status(400).json({message:"Error Upadating Username"})
+    const editUser = await User.findByIdAndUpdate(user, { username });
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Username" });
     }
 
-    return res.status(200).json({message:"User Updated Successfully"})
+    return res.status(200).json({ message: "User Updated Successfully" });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json({message:"Internal Server Error"})
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -333,12 +334,12 @@ export const verifyOtp = async (req, res) => {
 
 export const addSOS = async (req, res) => {
   const userId = req.user;
-  const { email,name,phno } = req.body;
+  const { email, name, phno } = req.body;
 
   try {
     const nowuser = await User.findByIdAndUpdate(
       userId,
-      { $push: { sos: {email,name,phno} } },
+      { $push: { sos: { email, name, phno } } },
       { new: true }
     );
 

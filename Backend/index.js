@@ -5,6 +5,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import http from "http";
+import { Server as SocketIo } from "socket.io";
 
 import adminRoutes from "./routes/admin.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -52,12 +54,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// const corsOptions = {
-//   origin: process.env.CLIENT_URL || "*",
-//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-// };
 app.use(cors());
+const server = http.createServer(app);
+const io = new SocketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 // Environment Validation
 const requiredEnvVars = ["MONGODB_URI", "PORT", "BACKEND_URL"];
@@ -102,4 +106,20 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
+});
+
+// io Connection Logs
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  // Join room based on user ID
+  socket.on("join", (userId) => {
+    console.log(`User joined room: ${userId}`);
+    socket.join(userId);
+  });
+
+  // Handle disconnect
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
+  });
 });

@@ -16,13 +16,14 @@ export const getAllSupportMem = async (req, res) => {
 };
 
 export const postSupportMem = async (req, res) => {
-  const { name, phno, position } = req.body;
+  const { name, phno, position, password } = req.body;
 
   try {
     const newSupportStaff = await Support.create({
       name,
       phno,
       position,
+      password,
     });
 
     if (!newSupportStaff) {
@@ -47,7 +48,7 @@ export const postSupportMem = async (req, res) => {
 
 export const updateSupportMem = async (req, res) => {
   const { id } = req.params;
-  const { name, phno, position } = req.body;
+  const { name, phno, position, password } = req.body;
 
   try {
     const updatedSStaff = await Support.findByIdAndUpdate(
@@ -56,6 +57,7 @@ export const updateSupportMem = async (req, res) => {
         name,
         phno,
         position,
+        password,
       },
       { new: true }
     );

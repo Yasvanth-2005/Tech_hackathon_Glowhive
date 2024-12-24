@@ -136,3 +136,24 @@ export const loginSupportMem = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const fetchFaculty = async (req, res) => {
+  const userId = req.faculty;
+
+  try {
+    const user = await Support.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userResponse = {
+      ...user._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};

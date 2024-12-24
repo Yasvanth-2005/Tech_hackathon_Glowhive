@@ -1,41 +1,25 @@
 import express from "express";
-import Message from "../models/message.model.js";
+
+import { verifyUserToken } from "../middleware/userTokenCheck.js";
+import facultyTokenCheck from "../middleware/facultyTokenCheck.js";
+
+import {
+  fetchChats,
+  fetchHistory,
+  sendMessage,
+} from "../controllers/chat.controllers.js";
 
 const router = express.Router();
 
-router.get("/history/:userId/:supportId", async (req, res) => {
-  const { userId, supportId } = req.params;
+router.get("/history/user/:userId/:supportId", verifyUserToken, fetchHistory);
+router.get(
+  "/history/faculty/:userId/:supportId",
+  facultyTokenCheck,
+  fetchHistory
+);
+router.post("/user/send", verifyUserToken, sendMessage);
+router.post("/faculty/send", facultyTokenCheck, sendMessage);
 
-  try {
-    const messages = await Message.find({
-      $or: [
-        { sender: userId, receiver: supportId },
-        { sender: supportId, receiver: userId },
-      ],
-    }).sort({ createdAt: 1 });
-
-    res.status(200).json(messages);
-  } catch (err) {
-    console.error("Error fetching chat history:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-router.post("/send", async (req, res) => {
-  const { senderId, receiverId, message } = req.body;
-
-  try {
-    const newMessage = await Message.create({
-      sender: senderId,
-      receiver: receiverId,
-      message,
-    });
-
-    res.status(201).json(newMessage);
-  } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+router.get("/faculty/chats", facultyTokenCheck, fetchChats);
 
 export default router;

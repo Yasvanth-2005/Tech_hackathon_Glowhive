@@ -12,12 +12,12 @@ const facultyTokenCheck = async (req, res, next) => {
       return res.status(401).json({ message: "Token not provided" });
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_ADMIN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.JWT_FACULTY_SECRET);
     if (!decodedToken) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    req.faculty = decodedToken.userId;
+    req.faculty = decodedToken.facultyId;
     next();
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized" });

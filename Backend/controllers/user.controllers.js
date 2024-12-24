@@ -59,7 +59,7 @@ export const userLogin = async (req, res) => {
       password: undefined,
     };
 
-    return res.status(200).json({ user: userResponse, token });
+    return res.status(200).json({ user: userResponse, token, role: "User" });
   } catch (error) {
     console.error("Error during User login:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -67,10 +67,17 @@ export const userLogin = async (req, res) => {
 };
 
 export const userRegister = async (req, res) => {
-  const { username, password, phno, collegeId, email } = req.body;
+  const { username, password, phno, collegeId, email, primary_sos } = req.body;
 
   try {
-    if (!username || !password || !phno || !collegeId || !email) {
+    if (
+      !username ||
+      !password ||
+      !phno ||
+      !collegeId ||
+      !email ||
+      !primary_sos
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -104,7 +111,7 @@ export const userRegister = async (req, res) => {
       password: undefined,
     };
 
-    return res.status(201).json({ user: userResponse, token });
+    return res.status(201).json({ user: userResponse, token, role: "User" });
   } catch (error) {
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
@@ -236,6 +243,23 @@ export const updateUsername = async (req, res) => {
 
   try {
     const editUser = await User.findByIdAndUpdate(user, { username });
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Username" });
+    }
+
+    return res.status(200).json({ message: "User Updated Successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updatePrimarySOS = async (req, res) => {
+  const user = req.user;
+  const { primary_sos } = req.body;
+
+  try {
+    const editUser = await User.findByIdAndUpdate(user, { primary_sos });
     if (!editUser) {
       return res.status(400).json({ message: "Error Upadating Username" });
     }

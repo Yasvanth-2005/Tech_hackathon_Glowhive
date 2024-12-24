@@ -8,6 +8,7 @@ import {
   postSOS,
   sendOtp,
   updateChecking,
+  updatePrimarySOS,
   updateProfile,
   updateUsername,
   userLogin,
@@ -30,7 +31,8 @@ router.put("/checking", verifyUserToken, updateChecking);
 router.patch("/sos", verifyUserToken, addSOS);
 router.post("/sos/submit", verifyUserToken, postSOS);
 
-router.patch("/edit/username",verifyUserToken,updateUsername)
+router.patch("/edit/username", verifyUserToken, updateUsername);
+router.patch("/edit/primary", verifyUserToken, updatePrimarySOS);
 
 router.post("/send/otp", sendOtp);
 router.post("/verify/otp", verifyOtp);

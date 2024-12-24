@@ -48,6 +48,11 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    primary_sos: {
+      type: String,
+      required: [true, "Primary SOS phone number is required"],
+      match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
+    },
   },
   {
     timestamps: true,

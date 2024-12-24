@@ -1,4 +1,5 @@
 import Support from "../models/support.model.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 export const getAllSupportMem = async (req, res) => {
@@ -117,7 +118,10 @@ export const loginSupportMem = async (req, res) => {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
 
-    const token = jwt.sign({ facultyId: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { facultyId: user._id },
+      process.env.JWT_FACULTY_SECRET
+    );
 
     const userResponse = {
       ...user._doc,

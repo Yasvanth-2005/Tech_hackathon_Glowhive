@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import SOS from "../models/sosMembers.model.js";
 import Otp from "../models/otp.model.js";
+import ForgotPassword from "../models/forgotPassword.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -66,6 +67,40 @@ export const userLogin = async (req, res) => {
   }
 };
 
+export const userGoogleLogin = async (req, res) => {
+  const { email, secret } = req.body;
+
+  try {
+    if (!email || !secret) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+
+    if (email.slice(0, 10).toLowerCase() !== secret) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() }).populate(
+      "complaints"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid Credentials" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+    const userResponse = {
+      ...user._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse, token, role: "User" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const userRegister = async (req, res) => {
   const { username, password, phno, collegeId, email, primary_sos } = req.body;
 
@@ -102,6 +137,7 @@ export const userRegister = async (req, res) => {
       phno,
       collegeId,
       password: hashedPassword,
+      primary_sos,
     });
 
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
@@ -242,6 +278,10 @@ export const updateUsername = async (req, res) => {
   const { username } = req.body;
 
   try {
+    if (!username) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const editUser = await User.findByIdAndUpdate(user, { username });
     if (!editUser) {
       return res.status(400).json({ message: "Error Upadating Username" });
@@ -259,6 +299,10 @@ export const updatePrimarySOS = async (req, res) => {
   const { primary_sos } = req.body;
 
   try {
+    if (!primary_sos) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const editUser = await User.findByIdAndUpdate(user, { primary_sos });
     if (!editUser) {
       return res.status(400).json({ message: "Error Upadating Username" });
@@ -353,6 +397,121 @@ export const verifyOtp = async (req, res) => {
   } catch (err) {
     console.error("Error during OTP verification:", err.message);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const postForgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const rguktnEmailRegex = /^[NnRrOoSs]\d{6}@rguktn\.ac\.in$/;
+  if (!email || !rguktnEmailRegex.test(email)) {
+    return res.status(400).json({ message: "RGUKTN Email is required" });
+  }
+
+  try {
+    const emailExists = await User.findOne({ email: email.toLowerCase() });
+    if (!emailExists) {
+      return res.status(409).json({ message: "User Doesn't exists" });
+    }
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    const existingOtp = await ForgotPassword.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (existingOtp) {
+      existingOtp.otp = otp;
+      await existingOtp.save();
+    } else {
+      const newOtp = new ForgotPassword({ email: email.toLowerCase(), otp });
+      await newOtp.save();
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: {
+        name: "Girls Grevience Password Recovery",
+        address: "sivahere9484@gmail.com",
+      },
+      to: email.split(",").map((email) => email.trim()),
+      subject: "Password Verification of Girl Grievance",
+      html: `
+        <>
+          <h1>${otp}</h1>
+        </>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return res.status(200).json({ message: "OTP sent to email successfully" });
+  } catch (err) {
+    console.error("Error while sending OTP:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const verifyForgotPassword = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    const existingOtp = await ForgotPassword.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (!existingOtp) {
+      return res.status(401).json({ message: "OTP expired or not found" });
+    }
+
+    if (existingOtp.otp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    await ForgotPassword.deleteOne({ email: email.toLowerCase() });
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (err) {
+    console.error("Error during OTP verification:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const resPassword = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!password || !email) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const editUser = await User.findOneAndUpdate(
+      { email },
+      { password: hashedPassword }
+    );
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Passwords" });
+    }
+
+    return res.status(200).json({ message: "User Updated Successfully" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Sever Error" });
   }
 };
 

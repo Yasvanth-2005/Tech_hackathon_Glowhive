@@ -650,13 +650,10 @@ export const addSOS = async (req, res) => {
 //   }
 // };
 
-import fs from "fs/promises";
-
 export const postSOS = async (req, res) => {
   try {
     const userId = req.user;
-    let attachments = req.files || [];
-    const { location } = req.body;
+    const { audioLink, videoLink, location } = req.body;
 
     // Validate location
     if (!Array.isArray(location) || location.length !== 2) {
@@ -712,26 +709,29 @@ export const postSOS = async (req, res) => {
           <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
           <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
           <h5 style="text-align:center">Dear ${recipient.name},</h5>
-          <p style="text-align:center">The app recognizes that one of your Users is in a Threat Situation.</p>
+          <p style="text-align:center">The app recognizes that one of your users is in a threat situation.</p>
           <pre style="text-align:center">
             Name of User: ${userResponse.username}
             Contact Information: +91 ${userResponse.phno}
             Location Coordinates: [${lat}, ${long}]
             <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
+            ${
+              audioLink
+                ? `<a href="${audioLink}" target="_blank">Listen to Audio</a>`
+                : "Audio: Not provided"
+            }
+            ${
+              videoLink
+                ? `<a href="${videoLink}" target="_blank">Watch Video</a>`
+                : "Video: Not provided"
+            }
           </pre>
         `,
-        attachments: attachments.map((att) => ({
-          filename: att.originalname,
-          path: att.path,
-        })),
       })
     );
 
     // Send emails to all recipients
     await Promise.all(emailPromises);
-
-    // Clean up uploaded files
-    await Promise.all(attachments.map((att) => fs.unlink(att.path)));
 
     // Respond with success
     return res
@@ -739,13 +739,6 @@ export const postSOS = async (req, res) => {
       .json({ message: "SOS notifications sent successfully." });
   } catch (err) {
     console.error("Error in postSOS:", err.message);
-
-    // Ensure any file cleanup even on errors
-    if (req.files) {
-      await Promise.all(
-        req.files.map((att) => fs.unlink(att.path).catch(() => null))
-      );
-    }
 
     return res.status(500).json({ message: "Internal Server Error" });
   }

@@ -17,6 +17,7 @@ router.get(
   facultyTokenCheck,
   fetchHistory
 );
+
 router.post("/user/send", verifyUserToken, sendMessage);
 router.post("/faculty/send", facultyTokenCheck, sendMessage);
 

@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { HiOutlineViewList } from "react-icons/hi";
-import { VscChromeClose } from "react-icons/vsc";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { IoLogInOutline } from "react-icons/io5";
-import {
-  MdNotificationsActive,
-  MdSpaceDashboard,
-  MdAdminPanelSettings,
-} from "react-icons/md";
-import { LuNotebookPen } from "react-icons/lu";
-import { FaPersonBreastfeeding } from "react-icons/fa6";
 import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../store/authSlice";
 import { toast } from "react-hot-toast";
+import {
+  MdSpaceDashboard,
+  MdNotificationsActive,
+  MdAdminPanelSettings,
+  MdLogout,
+  MdPerson,
+  MdMenu,
+} from "react-icons/md";
+import { LuNotebookPen } from "react-icons/lu";
+import { FaPersonBreastfeeding } from "react-icons/fa6";
+import { IoAlertCircle } from "react-icons/io5";
 
-// Breadcrumb Component
 const Breadcrumb = () => {
   const location = useLocation();
   const pathSegments = location.pathname.split("/").filter(Boolean);
 
   return (
-    <nav className="breadcrumb mt-4 mb-2">
+    <nav className="breadcrumb mt-4 mb-6">
       <ul className="flex items-center text-sm text-gray-500 space-x-2">
         {pathSegments.map((segment, index) => {
           const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
@@ -28,7 +28,7 @@ const Breadcrumb = () => {
 
           return (
             <li key={index} className="flex items-center space-x-2">
-              <span>/</span>
+              {index > 0 && <span className="text-gray-400">/</span>}
               {isLast ? (
                 <span className="text-lg font-semibold text-purple-600 capitalize">
                   {segment}
@@ -51,142 +51,168 @@ const Breadcrumb = () => {
 
 const Layout = ({ children }) => {
   const dispatch = useDispatch();
-  const [width, setWidth] = useState(window.innerWidth);
-  const [showSidebar, setShowSidebar] = useState(false);
   const user = useSelector((state) => state.auth.user?.admin);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const topBarTabs = [
+  const sidebarItems = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
-    {
-      label: "Notifications",
-      path: "notifications",
-      icon: MdNotificationsActive,
-    },
+    { label: "Notifications", path: "notifications", icon: MdNotificationsActive },
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },
     { label: "Support", path: "support", icon: FaPersonBreastfeeding },
-    { label: "SOS", path: "sos", icon: FaPersonBreastfeeding },
+    { label: "SOS", path: "sos", icon: IoAlertCircle },
   ];
 
   const isActive = (path) => location.pathname.includes(path);
 
-  const handleWidth = () => {
-    const newWidth = window.innerWidth;
-    setWidth(newWidth);
-    if (newWidth >= 768) setShowSidebar(false); // Close sidebar for desktop view
+  const handleLogout = () => {
+    dispatch(signOut());
+    toast.success("Logout successful");
+    navigate("/");
   };
 
+  // Close dropdown when clicking outside
   useEffect(() => {
-    window.addEventListener("resize", handleWidth);
-    return () => window.removeEventListener("resize", handleWidth);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle responsive sidebar
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <>
-      {/* Header */}
-      <div className="w-full fixed top-0 flex items-center justify-between h-[60px] z-[2] shadow-md bg-white">
-        <div className="flex items-center">
-          <HiOutlineViewList
-            className="text-2xl mx-3 block md:hidden text-purple-600 cursor-pointer"
-            onClick={() => setShowSidebar(!showSidebar)}
-          />
-          <Link
-            to="/"
-            className="logo font-semibold text-purple-600 select-none px-3 text-2xl"
-          >
-            Girl Grievance
-          </Link>
-        </div>
-        <div className="flex items-center text-gray-700">
-          <div className="tab cursor-pointer font-semibold mx-[20px] px-4 py-1 flex items-center rounded-full md:shadow-md md:border">
-            <div className="hidden mx-2 md:inline-block">{user?.username}</div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside
+        className={`${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed md:relative md:translate-x-0 z-30 w-64 h-full bg-white border-r transition-transform duration-300 ease-in-out`}
+      >
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b">
+            <Link to="/" className="text-2xl font-bold text-purple-600">
+              Girl Grievance
+            </Link>
+          </div>
+          <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+            {sidebarItems.map((item, index) => (
+              <Link
+                key={index}
+                to={`/${item.path}`}
+                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-purple-100 hover:text-purple-600 rounded-lg transition-colors duration-200 ${
+                  isActive(item.path) ? "bg-purple-100 text-purple-600" : ""
+                }`}
+              >
+                <item.icon className="w-5 h-5 mr-3" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+          <div className="p-4 border-t">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-purple-100 hover:text-purple-600 rounded-lg transition-colors duration-200"
+            >
+              <MdLogout className="w-5 h-5 mr-2" />
+              Logout
+            </button>
           </div>
         </div>
-      </div>
+      </aside>
 
-      {/* Sidebar */}
-      <div
-        className={`sidebar z-[1000] shadow-md fixed md:hidden w-full top-0 ${
-          showSidebar ? "left-0" : "-left-full"
-        } duration-500 h-screen bg-white flex flex-col`}
-      >
-        <div className="w-full flex items-center justify-end p-3">
-          <VscChromeClose
-            className="text-[30px] cursor-pointer"
-            onClick={() => setShowSidebar(false)}
-          />
-        </div>
-        <div className="flex flex-col md:gap-4">
-          {topBarTabs.map((item, index) => (
-            <Link
-              key={index}
-              to={`/${item.path}`}
-              onClick={() => setShowSidebar(false)}
-              className={`tab-heading w-[97%] text-purple-600 mx-auto px-4 py-2 mt-2 text-lg font-bold flex items-center ${
-                isActive(item.path)
-                  ? "text-purple-600"
-                  : "hover:text-purple-500"
-              }`}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white border shadow-sm z-20">
+          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex md:justify-end  justify-between items-center">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="text-gray-500 hover:text-gray-600 focus:outline-none md:hidden"
             >
-              <item.icon className="mr-2" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-          <button
-            className="w-[90%] py-2 mx-auto bg-purple-600 font-bold text-white rounded-md flex items-center justify-center gap-2 mt-10"
-            onClick={() => {
-              dispatch(signOut());
-              toast.success("Logout successful");
-              navigate("/");
-            }}
-          >
-            Logout
-            <IoLogInOutline />
-          </button>
-        </div>
-      </div>
-
-      {/* Content Layout */}
-      <div className="flex flex-col md:flex-row mt-[60px] h-[calc(100vh-60px)]">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:flex flex-col w-[240px] border-r h-full bg-purple-50">
-          {topBarTabs.map((item, index) => (
-            <Link
-              key={index}
-              to={`/${item.path}`}
-              className={`tab-heading px-4 text-purple-600 py-2 text-lg mt-[3px] w-[92%] mx-auto font-semibold flex items-center rounded-md ${
-                isActive(item.path)
-                  ? "bg-purple-100 text-purple-600"
-                  : "hover:bg-purple-100 hover:text-purple-600"
-              }`}
-            >
-              <item.icon className="mr-2" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-          <button
-            onClick={() => {
-              dispatch(signOut());
-              toast.success("Logout successful");
-              navigate("/");
-            }}
-            className="w-[90%] py-2 mx-auto bg-purple-600 text-white rounded-md flex items-center justify-center gap-2 mt-10"
-          >
-            Logout
-            <IoLogInOutline />
-          </button>
-        </div>
+              <MdMenu className="w-6 h-6" />
+            </button>
+            <div className="relative " ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center  space-x-2 focus:outline-none"
+              >
+                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                  {user?.username?.charAt(0) || "U"}
+                </div>
+                <span className="hidden md:block text-gray-700">
+                  {user?.username}
+                </span>
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <button
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-purple-50 flex items-center"
+                    onClick={() => {
+                      // Handle view profile
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    <MdPerson className="w-4 h-4 mr-2" />
+                    View Profile
+                  </button>
+                  <div className="h-px bg-gray-200 my-1" />
+                  <button
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-purple-50 flex items-center"
+                    onClick={() => {
+                      handleLogout();
+                      setIsDropdownOpen(false);
+                    }}
+                  >
+                    <MdLogout className="w-4 h-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-          <Breadcrumb />
-          {children}
-        </div>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+          <div className="container mx-auto p-4">
+            <Breadcrumb />
+            {children}
+          </div>
+        </main>
       </div>
-    </>
+
+      {/* Overlay for mobile sidebar */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+    </div>
   );
 };
 
 export default Layout;
+

@@ -47,7 +47,7 @@ Framework/Library: Flutter
 UI/UX Design: Figma or Adobe XD (for designing app layouts and user flows)
 State Management: Redux or Context API
 
-[https://admin-glowhive.netlify.app/](https://moonlit-haupia-6ff9d6.netlify.app/)
+[https://admin-glowhive.netlify.app/](https://admin-glowhive.netlify.app/)
 
 ## Backend
 Server Framework: Node.js with Express.js (for handling APIs and business logic)

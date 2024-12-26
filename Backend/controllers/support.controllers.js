@@ -1,4 +1,6 @@
 import Support from "../models/support.model.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const getAllSupportMem = async (req, res) => {
   try {
@@ -16,13 +18,17 @@ export const getAllSupportMem = async (req, res) => {
 };
 
 export const postSupportMem = async (req, res) => {
-  const { name, phno, position } = req.body;
+  const { name, phno, position, password } = req.body;
 
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newSupportStaff = await Support.create({
       name,
       phno,
       position,
+      password: hashedPassword,
     });
 
     if (!newSupportStaff) {
@@ -47,7 +53,7 @@ export const postSupportMem = async (req, res) => {
 
 export const updateSupportMem = async (req, res) => {
   const { id } = req.params;
-  const { name, phno, position } = req.body;
+  const { name, phno, position, password } = req.body;
 
   try {
     const updatedSStaff = await Support.findByIdAndUpdate(
@@ -56,6 +62,7 @@ export const updateSupportMem = async (req, res) => {
         name,
         phno,
         position,
+        password,
       },
       { new: true }
     );
@@ -90,5 +97,63 @@ export const deleteSupportmen = async (req, res) => {
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const loginSupportMem = async (req, res) => {
+  const { phno, password } = req.body;
+
+  try {
+    if (!password || !phno) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const user = await Support.findOne({ phno });
+    if (!user) {
+      return res.status(404).json({ message: "Invalid Credentials" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(404).json({ message: "Invalid Credentials" });
+    }
+
+    const token = jwt.sign(
+      { facultyId: user._id },
+      process.env.JWT_FACULTY_SECRET
+    );
+
+    const userResponse = {
+      ...user._doc,
+      password: undefined,
+    };
+
+    return res
+      .status(200)
+      .json({ faculty: userResponse, token, role: "Faculty" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const fetchFaculty = async (req, res) => {
+  const userId = req.faculty;
+
+  try {
+    const user = await Support.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userResponse = {
+      ...user._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };

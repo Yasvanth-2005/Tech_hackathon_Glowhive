@@ -23,7 +23,21 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     sos: {
-      type: [{ type: String }],
+      type: [
+        {
+          name: { type: String, required: true },
+          phno: {
+            type: String,
+            required: true,
+            match: [/^\d{10}$/, "Phone number must be 10 digits"],
+          },
+          email: {
+            type: String,
+            required: true,
+            match: [/.+@.+\..+/, "Please enter a valid email address"],
+          },
+        },
+      ],
       default: [],
     },
     complaints: {
@@ -33,6 +47,11 @@ const UserSchema = new mongoose.Schema(
     is_checked: {
       type: Boolean,
       default: false,
+    },
+    primary_sos: {
+      type: String,
+      required: [true, "Primary SOS phone number is required"],
+      match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
     },
   },
   {

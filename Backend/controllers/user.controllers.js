@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import SOS from "../models/sosMembers.model.js";
 import Otp from "../models/otp.model.js";
+import ForgotPassword from "../models/forgotPassword.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -59,18 +60,59 @@ export const userLogin = async (req, res) => {
       password: undefined,
     };
 
-    return res.status(200).json({ user: userResponse, token });
+    return res.status(200).json({ user: userResponse, token, role: "User" });
   } catch (error) {
     console.error("Error during User login:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const userRegister = async (req, res) => {
-  const { username, password, phno, collegeId, email } = req.body;
+export const userGoogleLogin = async (req, res) => {
+  const { email, secret } = req.body;
 
   try {
-    if (!username || !password || !phno || !collegeId || !email) {
+    if (!email || !secret) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+
+    if (email.slice(0, 10).toLowerCase() !== secret) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() }).populate(
+      "complaints"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid Credentials" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+    const userResponse = {
+      ...user._doc,
+      password: undefined,
+    };
+
+    return res.status(200).json({ user: userResponse, token, role: "User" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const userRegister = async (req, res) => {
+  const { username, password, phno, collegeId, email, primary_sos } = req.body;
+
+  try {
+    if (
+      !username ||
+      !password ||
+      !phno ||
+      !collegeId ||
+      !email ||
+      !primary_sos
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -95,6 +137,7 @@ export const userRegister = async (req, res) => {
       phno,
       collegeId,
       password: hashedPassword,
+      primary_sos,
     });
 
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
@@ -104,7 +147,7 @@ export const userRegister = async (req, res) => {
       password: undefined,
     };
 
-    return res.status(201).json({ user: userResponse, token });
+    return res.status(201).json({ user: userResponse, token, role: "User" });
   } catch (error) {
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
@@ -230,6 +273,48 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const updateUsername = async (req, res) => {
+  const user = req.user;
+  const { username } = req.body;
+
+  try {
+    if (!username) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const editUser = await User.findByIdAndUpdate(user, { username });
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Username" });
+    }
+
+    return res.status(200).json({ message: "User Updated Successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updatePrimarySOS = async (req, res) => {
+  const user = req.user;
+  const { primary_sos } = req.body;
+
+  try {
+    if (!primary_sos) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const editUser = await User.findByIdAndUpdate(user, { primary_sos });
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Username" });
+    }
+
+    return res.status(200).json({ message: "User Updated Successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
 
@@ -315,14 +400,129 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
+export const postForgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const rguktnEmailRegex = /^[NnRrOoSs]\d{6}@rguktn\.ac\.in$/;
+  if (!email || !rguktnEmailRegex.test(email)) {
+    return res.status(400).json({ message: "RGUKTN Email is required" });
+  }
+
+  try {
+    const emailExists = await User.findOne({ email: email.toLowerCase() });
+    if (!emailExists) {
+      return res.status(409).json({ message: "User Doesn't exists" });
+    }
+
+    const otp = crypto.randomInt(10000, 99999).toString();
+
+    const existingOtp = await ForgotPassword.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (existingOtp) {
+      existingOtp.otp = otp;
+      await existingOtp.save();
+    } else {
+      const newOtp = new ForgotPassword({ email: email.toLowerCase(), otp });
+      await newOtp.save();
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: {
+        name: "Girls Grevience Password Recovery",
+        address: "sivahere9484@gmail.com",
+      },
+      to: email.split(",").map((email) => email.trim()),
+      subject: "Password Verification of Girl Grievance",
+      html: `
+        <>
+          <h1>${otp}</h1>
+        </>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return res.status(200).json({ message: "OTP sent to email successfully" });
+  } catch (err) {
+    console.error("Error while sending OTP:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const verifyForgotPassword = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
+
+  try {
+    const existingOtp = await ForgotPassword.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (!existingOtp) {
+      return res.status(401).json({ message: "OTP expired or not found" });
+    }
+
+    if (existingOtp.otp !== otp) {
+      return res.status(401).json({ message: "Invalid OTP" });
+    }
+
+    await ForgotPassword.deleteOne({ email: email.toLowerCase() });
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (err) {
+    console.error("Error during OTP verification:", err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const resPassword = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!password || !email) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const editUser = await User.findOneAndUpdate(
+      { email },
+      { password: hashedPassword }
+    );
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Passwords" });
+    }
+
+    return res.status(200).json({ message: "User Updated Successfully" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Sever Error" });
+  }
+};
+
 export const addSOS = async (req, res) => {
   const userId = req.user;
-  const { numbers } = req.body;
+  const { email, name, phno } = req.body;
 
   try {
     const nowuser = await User.findByIdAndUpdate(
       userId,
-      { $push: { sos: numbers } },
+      { $push: { sos: { email, name, phno } } },
       { new: true }
     );
 
@@ -450,14 +650,12 @@ export const addSOS = async (req, res) => {
 //   }
 // };
 
-import fs from "fs/promises";
-
 export const postSOS = async (req, res) => {
   try {
     const userId = req.user;
-    let attachments = req.files || [];
-    const { location } = req.body;
+    const { audioLink, videoLink, location } = req.body;
 
+    // Validate location
     if (!Array.isArray(location) || location.length !== 2) {
       return res
         .status(400)
@@ -465,6 +663,7 @@ export const postSOS = async (req, res) => {
     }
     const [lat, long] = location;
 
+    // Fetch the user
     const nowuser = await User.findById(userId);
     if (!nowuser) {
       return res.status(404).json({ message: "User not found" });
@@ -472,9 +671,18 @@ export const postSOS = async (req, res) => {
 
     const userResponse = {
       ...nowuser._doc,
-      password: undefined,
+      password: undefined, // Mask sensitive information
     };
 
+    // Fetch SOS recipient emails
+    const sosNumbers = await SOS.find();
+    if (!sosNumbers.length) {
+      return res
+        .status(404)
+        .json({ message: "No SOS recipients found in the database." });
+    }
+
+    // Create nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
@@ -488,48 +696,49 @@ export const postSOS = async (req, res) => {
 
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
 
-    // Send email to the specified recipient
-    await transporter.sendMail({
-      from: {
-        name: "SOS Alert",
-        address: "sivahere9484@gmail.com",
-      },
-      to: "yasvanthhanumantu1@gmail.com",
-      subject: "🚨 SOS Notification 🚨",
-      html: `
-        <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
-        <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
-        <h5 style="text-align:center">Dear Authority,</h5>
-        <p style="text-align:center">The app recognizes that one of your Users is in a Threat Situation.</p>
-        <pre style="text-align:center">
-          Name of User: ${userResponse.username}
-          Contact Information: +91 ${userResponse.phno}
-          Location Coordinates: [${lat}, ${long}]
-          <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
-        </pre>
-      `,
-      attachments: attachments.map((att) => ({
-        filename: att.originalname,
-        path: att.path,
-      })),
-    });
+    // Prepare email promises for all recipients
+    const emailPromises = sosNumbers.map((recipient) =>
+      transporter.sendMail({
+        from: {
+          name: "SOS Alert",
+          address: "sivahere9484@gmail.com",
+        },
+        to: recipient.email,
+        subject: "🚨 SOS Notification 🚨",
+        html: `
+          <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
+          <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
+          <h5 style="text-align:center">Dear ${recipient.name},</h5>
+          <p style="text-align:center">The app recognizes that one of your users is in a threat situation.</p>
+          <pre style="text-align:center">
+            Name of User: ${userResponse.username}
+            Contact Information: +91 ${userResponse.phno}
+            Location Coordinates: [${lat}, ${long}]
+            <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
+            ${
+              audioLink
+                ? `<a href="${audioLink}" target="_blank">Listen to Audio</a>`
+                : "Audio: Not provided"
+            }
+            ${
+              videoLink
+                ? `<a href="${videoLink}" target="_blank">Watch Video</a>`
+                : "Video: Not provided"
+            }
+          </pre>
+        `,
+      })
+    );
 
-    // Clean up uploaded files
-    await Promise.all(attachments.map((att) => fs.unlink(att.path)));
+    // Send emails to all recipients
+    await Promise.all(emailPromises);
 
     // Respond with success
     return res
       .status(200)
-      .json({ message: "SOS notification sent successfully" });
+      .json({ message: "SOS notifications sent successfully." });
   } catch (err) {
     console.error("Error in postSOS:", err.message);
-
-    // Ensure any file cleanup even on errors
-    if (req.files) {
-      await Promise.all(
-        req.files.map((att) => fs.unlink(att.path).catch(() => null))
-      );
-    }
 
     return res.status(500).json({ message: "Internal Server Error" });
   }

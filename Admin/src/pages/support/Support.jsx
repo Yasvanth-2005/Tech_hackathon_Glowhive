@@ -108,30 +108,30 @@ const Support = () => {
           <div className="text-center">Loading...</div>
         ) : members.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 text-left">
+            <table className="w-full border-collapse text-nowrap text-left">
               <thead className="bg-purple-600 font-bold text-white text-nowrap">
                 <tr>
-                  <th className="border border-gray-300 px-4 py-2">Name</th>
-                  <th className="border border-gray-300 px-4 py-2">Phone Number</th>
-                  <th className="border border-gray-300 px-4 py-2">Position</th>
-                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                  <th className="text-nowrap px-4 py-2">Name</th>
+                  <th className="text-nowrap px-4 py-2">Phone Number</th>
+                  <th className="text-nowrap px-4 py-2">Position</th>
+                  <th className="text-nowrap px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {members.map((member) => (
                   <tr key={member._id} className="hover:bg-gray-50">
-                    <td className="border border-gray-300 px-4 py-2">{member.name}</td>
-                    <td className="border border-gray-300 px-4 py-2">{member.phno}</td>
-                    <td className="border border-gray-300 px-4 py-2">{member.position}</td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="text-nowrap px-4 py-2">{member.name}</td>
+                    <td className="text-nowrap px-4 py-2">{member.phno}</td>
+                    <td className="text-nowrap px-4 py-2">{member.position}</td>
+                    <td className="text-nowrap px-4 py-2">
                       <button
-                        className="text-blue-500 mx-1"
+                        className="bg-blue-200 px-2 py-1 text-[12px] rounded-md text-blue-600 font-bold mx-2"
                         onClick={() => openEditModal(member)}
                       >
                         Edit
                       </button>
                       <button
-                        className="text-red-500 mx-1"
+                        className="bg-red-200 px-2 py-1 text-[12px] rounded-md text-red-600 font-bold mx-2"
                         onClick={() => deleteMember(member._id)}
                       >
                         Delete

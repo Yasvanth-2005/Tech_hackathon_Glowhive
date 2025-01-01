@@ -20,23 +20,31 @@ export const getUserSOS = async (req, res) => {
   const user = req.user;
 
   try {
-    const globalSOS = await SOS.find();
+    // Fetch global SOS as plain objects
+    const globalSOS = await SOS.find().lean();
     const globalData = globalSOS.map((sos) => ({
-      ...sos._doc,
+      ...sos,
       type: "global",
     }));
 
-    const userDetails = await User.findById(user);
+    console.log("Global SOS Data:", globalData);
+
+    // Fetch user details
+    const userDetails = await User.findById(user).lean();
     if (!userDetails) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Process user's SOS
     const userSOS = userDetails.sos || [];
     const userData = userSOS.map((sos) => ({
       ...sos,
       type: "user",
     }));
 
+    console.log("User SOS Data:", userData);
+
+    // Combine global and user SOS
     const combinedSOS = [...globalData, ...userData];
     return res.status(200).json({ sos: combinedSOS });
   } catch (e) {

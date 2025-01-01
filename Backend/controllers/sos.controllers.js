@@ -42,8 +42,6 @@ export const getUserSOS = async (req, res) => {
       type: "user",
     }));
 
-    console.log("User SOS Data:", userData);
-
     // Combine global and user SOS
     const combinedSOS = [...globalData, ...userData];
     return res.status(200).json({ sos: combinedSOS });

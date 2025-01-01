@@ -1,4 +1,5 @@
 import Notifications from "../models/notifications.model.js";
+import axios from "axios";
 
 export const getAllNotifications = async (req, res) => {
   try {
@@ -37,6 +38,26 @@ export const postNotification = async (req, res) => {
       "sender",
       "username role"
     );
+
+    // OneSignal API call
+    const oneSignalResponse = await axios.post(
+      "https://onesignal.com/api/v1/notifications",
+      {
+        app_id: process.env.ONESIGNAL_APP_ID,
+        included_segments: ["Subscribed Users"],
+        headings: { en: title },
+        contents: { en: description },
+        data: { links },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${process.env.ONESIGNAL_API_KEY}`,
+        },
+      }
+    );
+
+    console.log("OneSignal response:", oneSignalResponse.data);
 
     return res.status(201).json({
       notification: populatedNotification,

@@ -1,3 +1,4 @@
+import Alert from "../models/alerts.model.js";
 import SOS from "../models/sosMembers.model.js";
 import User from "../models/user.model.js";
 
@@ -126,6 +127,38 @@ export const deleteSOSGlobal = async (req, res) => {
     });
   } catch (err) {
     console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getAlerts = async () => {
+  try {
+    const alerts = await Alert.find();
+
+    if (!alerts) {
+      return res.status(404).json({ message: "Alerts data Not Found" });
+    }
+
+    return res.status(200).json({ alerts });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateAlerts = async () => {
+  const { id } = req.params;
+
+  try {
+    const updatedAlert = await Alert.findByIdAndUpdate(id, {
+      status: "Solved",
+    });
+
+    if (!deletedSOS) {
+      return res.status(404).json({ message: "Updated Data not found" });
+    }
+  } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

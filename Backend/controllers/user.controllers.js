@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import Alert from "../models/alerts.model.js";
 
 export const fetchUser = async (req, res) => {
   const userId = req.user;
@@ -679,7 +680,6 @@ export const postSOS = async (req, res) => {
         .status(400)
         .json({ message: "Invalid location format. Expected [lat, long]." });
     }
-    const [lat, long] = location;
 
     // Fetch the user
     const nowuser = await User.findById(userId);
@@ -691,6 +691,16 @@ export const postSOS = async (req, res) => {
       ...nowuser._doc,
       password: undefined, // Mask sensitive information
     };
+
+    const [lat, long] = location;
+
+    await Alert.create({
+      username: nowuser.username,
+      email: nowuser.email,
+      audioLink,
+      videoLink,
+      location,
+    });
 
     // Fetch SOS recipient emails
     const sosNumbers = await SOS.find();

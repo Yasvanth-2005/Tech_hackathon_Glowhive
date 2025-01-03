@@ -517,8 +517,9 @@ export const resPassword = async (req, res) => {
 };
 
 export const addSOS = async (req, res) => {
-  const userId = req.user; // Ensure `req.user` is populated (e.g., via authentication middleware)
+  const userId = req.user;
   const { email, name, phno } = req.body;
+  console.log(email, name, phno);
 
   // Validate request body
   if (!email || !name || !phno) {

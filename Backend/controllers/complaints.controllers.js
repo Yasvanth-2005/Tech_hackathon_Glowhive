@@ -126,7 +126,7 @@ export const getAllComplaints = async (req, res) => {
       tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
 
       filter = {
-        createdAt: { $lt: tenDaysAgo }, // Complaints older than 10 days
+        $or: [{ isCritical: true }, { createdAt: { $lt: tenDaysAgo } }],
       };
     } else if (role !== "Warden") {
       // Other roles: Complaints within their respective roleDaysMapping time frame
@@ -193,6 +193,23 @@ export const getUserComplaintDetails = async (req, res) => {
 
     // Return all complaints associated with the user
     return res.status(200).json({ complaints: user.complaints });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const deleteComplaint = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedComplaint = await Complaints.findByIdAndDelete(id);
+
+    if (!deletedComplaint) {
+      return res.status(404).json({ message: "Complaint Not Found" });
+    }
+
+    return res.status(200).json({ message: "Complaint Deleted Successfully" });
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({ message: "Internal Server Error" });

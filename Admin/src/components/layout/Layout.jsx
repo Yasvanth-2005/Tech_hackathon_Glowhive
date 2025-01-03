@@ -5,7 +5,7 @@ import { signOut } from "../../store/authSlice";
 import { toast } from "react-hot-toast";
 import { FaUsers } from "react-icons/fa";
 import { RiAlertFill } from "react-icons/ri";
-
+import logo from '../../assets/logo.png'
 
 import {
   MdSpaceDashboard,
@@ -118,9 +118,11 @@ const Layout = ({ children }) => {
         } fixed md:relative md:translate-x-0 z-30 w-64 h-full bg-white border-r transition-transform duration-300 ease-in-out`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
-              Girl Grievance
+          <div className="p-4 ">
+            <Link to="/" className="flex text-2xl items-center gap-2 font-bold text-blue-600">
+              <img src={logo} className="w-[50px] h-[50px]"  />
+              <span class="font">Girl Grievance </span>
+             
             </Link>
           </div>
           <nav className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -160,11 +162,12 @@ const Layout = ({ children }) => {
             >
               <MdMenu className="w-6 h-6" />
             </button>
+            
             <div className="relative " ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center  space-x-2 focus:outline-none"
-              >
+                className="flex items-center space-x-2 focus:outline-none"
+              >  
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
                   {user?.username?.charAt(0) || "U"}
                 </div>

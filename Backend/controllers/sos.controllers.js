@@ -131,7 +131,7 @@ export const deleteSOSGlobal = async (req, res) => {
   }
 };
 
-export const getAlerts = async () => {
+export const getAlerts = async (req, res) => {
   try {
     const alerts = await Alert.find();
 
@@ -146,7 +146,7 @@ export const getAlerts = async () => {
   }
 };
 
-export const updateAlerts = async () => {
+export const updateAlerts = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
@@ -158,6 +158,8 @@ export const updateAlerts = async () => {
     if (!updateAlerts) {
       return res.status(404).json({ message: "Updated Data not found" });
     }
+
+    return res.status(200).json({ message: "Updated Succesfully" });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "Internal Server Error" });

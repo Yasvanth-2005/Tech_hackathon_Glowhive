@@ -735,7 +735,7 @@ export const postSOS = async (req, res) => {
             <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
             ${
               audioLink
-                ? `<a href="${audioLink}" target="_blank">Listen to Audio</a>`
+                ? `<a href="${audioLink}" target="_blank">${audioLink}</a>`
                 : "Audio: Not provided"
             }
             ${

@@ -131,7 +131,7 @@ export const deleteSOSGlobal = async (req, res) => {
   }
 };
 
-export const getAlerts = async () => {
+export const getAlerts = async (req, res) => {
   try {
     const alerts = await Alert.find();
 
@@ -146,7 +146,7 @@ export const getAlerts = async () => {
   }
 };
 
-export const updateAlerts = async () => {
+export const updateAlerts = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 

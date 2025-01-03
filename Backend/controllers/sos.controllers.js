@@ -1,3 +1,4 @@
+import Alert from "../models/alerts.model.js";
 import SOS from "../models/sosMembers.model.js";
 import User from "../models/user.model.js";
 
@@ -20,23 +21,30 @@ export const getUserSOS = async (req, res) => {
   const user = req.user;
 
   try {
-    const globalSOS = await SOS.find();
+    // Fetch global SOS as plain objects
+    const globalSOS = await SOS.find().lean();
     const globalData = globalSOS.map((sos) => ({
-      ...sos._doc,
+      ...sos,
       type: "global",
     }));
 
-    const userDetails = await User.findById(user);
+    console.log("Global SOS Data:", globalData);
+
+    // Fetch user details
+    const userDetails = await User.findById(user).lean();
     if (!userDetails) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Process user's SOS
+    console.log(userDetails.sos);
     const userSOS = userDetails.sos || [];
     const userData = userSOS.map((sos) => ({
       ...sos,
       type: "user",
     }));
 
+    // Combine global and user SOS
     const combinedSOS = [...globalData, ...userData];
     return res.status(200).json({ sos: combinedSOS });
   } catch (e) {
@@ -119,6 +127,39 @@ export const deleteSOSGlobal = async (req, res) => {
     });
   } catch (err) {
     console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getAlerts = async () => {
+  try {
+    const alerts = await Alert.find();
+
+    if (!alerts) {
+      return res.status(404).json({ message: "Alerts data Not Found" });
+    }
+
+    return res.status(200).json({ alerts });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateAlerts = async () => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedAlert = await Alert.findByIdAndUpdate(id, {
+      status,
+    });
+
+    if (!updateAlerts) {
+      return res.status(404).json({ message: "Updated Data not found" });
+    }
+  } catch (error) {
+    console.log(error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };

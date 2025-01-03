@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import Alert from "../models/alerts.model.js";
 
 export const fetchUser = async (req, res) => {
   const userId = req.user;
@@ -516,10 +517,28 @@ export const resPassword = async (req, res) => {
 };
 
 export const addSOS = async (req, res) => {
-  const userId = req.user;
+  const userId = req.user; // Ensure `req.user` is populated (e.g., via authentication middleware)
   const { email, name, phno } = req.body;
 
+  // Validate request body
+  if (!email || !name || !phno) {
+    return res
+      .status(400)
+      .json({ message: "All fields (email, name, phno) are required" });
+  }
+
+  if (!/.+@.+\..+/.test(email)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
+  if (!/^\d{10}$/.test(phno)) {
+    return res
+      .status(400)
+      .json({ message: "Phone number must be exactly 10 digits" });
+  }
+
   try {
+    // Update the user's SOS array
     const nowuser = await User.findByIdAndUpdate(
       userId,
       { $push: { sos: { email, name, phno } } },
@@ -530,10 +549,8 @@ export const addSOS = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const userResponse = {
-      ...nowuser._doc,
-      password: undefined,
-    };
+    // Exclude password from the response
+    const { password, ...userResponse } = nowuser.toObject();
 
     return res.status(200).json({ user: userResponse });
   } catch (err) {
@@ -654,6 +671,8 @@ export const postSOS = async (req, res) => {
   try {
     const userId = req.user;
     const { audioLink, videoLink, location } = req.body;
+    console.log(audioLink);
+    console.log(videoLink);
 
     // Validate location
     if (!Array.isArray(location) || location.length !== 2) {
@@ -661,7 +680,6 @@ export const postSOS = async (req, res) => {
         .status(400)
         .json({ message: "Invalid location format. Expected [lat, long]." });
     }
-    const [lat, long] = location;
 
     // Fetch the user
     const nowuser = await User.findById(userId);
@@ -673,6 +691,16 @@ export const postSOS = async (req, res) => {
       ...nowuser._doc,
       password: undefined, // Mask sensitive information
     };
+
+    const [lat, long] = location;
+
+    await Alert.create({
+      username: nowuser.username,
+      email: nowuser.email,
+      audioLink,
+      videoLink,
+      location,
+    });
 
     // Fetch SOS recipient emails
     const sosNumbers = await SOS.find();
@@ -717,7 +745,7 @@ export const postSOS = async (req, res) => {
             <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
             ${
               audioLink
-                ? `<a href="${audioLink}" target="_blank">Listen to Audio</a>`
+                ? `<a href="${audioLink}" target="_blank">${audioLink}</a>`
                 : "Audio: Not provided"
             }
             ${

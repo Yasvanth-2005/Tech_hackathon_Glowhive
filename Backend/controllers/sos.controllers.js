@@ -36,6 +36,7 @@ export const getUserSOS = async (req, res) => {
     }
 
     // Process user's SOS
+    console.log(userDetails.sos);
     const userSOS = userDetails.sos || [];
     const userData = userSOS.map((sos) => ({
       ...sos,

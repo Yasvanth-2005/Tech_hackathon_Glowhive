@@ -516,10 +516,28 @@ export const resPassword = async (req, res) => {
 };
 
 export const addSOS = async (req, res) => {
-  const userId = req.user;
+  const userId = req.user; // Ensure `req.user` is populated (e.g., via authentication middleware)
   const { email, name, phno } = req.body;
 
+  // Validate request body
+  if (!email || !name || !phno) {
+    return res
+      .status(400)
+      .json({ message: "All fields (email, name, phno) are required" });
+  }
+
+  if (!/.+@.+\..+/.test(email)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
+  if (!/^\d{10}$/.test(phno)) {
+    return res
+      .status(400)
+      .json({ message: "Phone number must be exactly 10 digits" });
+  }
+
   try {
+    // Update the user's SOS array
     const nowuser = await User.findByIdAndUpdate(
       userId,
       { $push: { sos: { email, name, phno } } },
@@ -530,10 +548,8 @@ export const addSOS = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const userResponse = {
-      ...nowuser._doc,
-      password: undefined,
-    };
+    // Exclude password from the response
+    const { password, ...userResponse } = nowuser.toObject();
 
     return res.status(200).json({ user: userResponse });
   } catch (err) {
@@ -654,6 +670,8 @@ export const postSOS = async (req, res) => {
   try {
     const userId = req.user;
     const { audioLink, videoLink, location } = req.body;
+    console.log(audioLink);
+    console.log(videoLink);
 
     // Validate location
     if (!Array.isArray(location) || location.length !== 2) {

@@ -155,7 +155,7 @@ export const updateAlerts = async () => {
       status,
     });
 
-    if (!deletedSOS) {
+    if (!updateAlerts) {
       return res.status(404).json({ message: "Updated Data not found" });
     }
   } catch (error) {

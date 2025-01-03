@@ -148,10 +148,11 @@ export const getAlerts = async () => {
 
 export const updateAlerts = async () => {
   const { id } = req.params;
+  const { status } = req.body;
 
   try {
     const updatedAlert = await Alert.findByIdAndUpdate(id, {
-      status: "Solved",
+      status,
     });
 
     if (!deletedSOS) {

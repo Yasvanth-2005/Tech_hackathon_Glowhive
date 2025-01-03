@@ -41,13 +41,11 @@ export const sendComplaint = async (req, res) => {
       return res.status(404).json({ message: "Posting Complaint Failed" });
     }
 
-    const user = await User.findById(req.user);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.complaints.push(complaint._id);
-    await user.save();
+    await User.findByIdAndUpdate(
+      req.user,
+      { $push: { complaints: complaint._id } },
+      { new: true }
+    );
 
     return res.status(200).json({
       message: "New Complaint Sent Successfully",

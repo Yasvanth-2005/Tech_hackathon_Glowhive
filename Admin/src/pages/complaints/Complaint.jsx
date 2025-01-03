@@ -77,6 +77,7 @@ const ComplaintDashboard = () => {
         )
       );
       setSelectedComplaint({ ...selectedComplaint, status: newStatus });
+      toast.success("status updated successfully");
     } catch (error) {
       toast.error(error.message);
     }

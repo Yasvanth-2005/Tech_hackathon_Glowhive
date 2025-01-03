@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../store/authSlice";
 import { toast } from "react-hot-toast";
 import { FaUsers } from "react-icons/fa";
+import { RiAlertFill } from "react-icons/ri";
+
 
 import {
   MdSpaceDashboard,
@@ -63,6 +65,7 @@ const Layout = ({ children }) => {
   const sidebarItems = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
     { label: "Notifications", path: "notifications", icon: MdNotificationsActive },
+    { label: "Alerts", path: "alerts", icon: RiAlertFill },
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
     { label: "Users", path: "users", icon: FaUsers },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },

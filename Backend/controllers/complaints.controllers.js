@@ -198,3 +198,20 @@ export const getUserComplaintDetails = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const deleteComplaint = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedComplaint = await Complaints.findByIdAndDelete(id);
+
+    if (!deletedComplaint) {
+      return res.status(404).json({ message: "Complaint Not Found" });
+    }
+
+    return res.status(200).json({ message: "Complaint Deleted Successfully" });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};

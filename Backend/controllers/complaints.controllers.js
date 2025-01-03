@@ -77,11 +77,11 @@ export const updateComplaint = async (req, res) => {
       return res.status(404).json({ message: "Complaint not found" });
     }
 
-    if (complaint.status === "Solved") {
-      return res
-        .status(400)
-        .json({ message: "Complaint is already solved. Cannot update." });
-    }
+    // if (complaint.status === "Solved") {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Complaint is already solved. Cannot update." });
+    // }
 
     complaint.status = status;
     await complaint.save();

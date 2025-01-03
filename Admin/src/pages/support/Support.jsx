@@ -96,7 +96,7 @@ const Support = () => {
       <div className="w-full flex items-center justify-between flex-wrap mb-6">
         <h1 className="text-2xl font-bold">Support Staff</h1>
         <button
-          className="mx-2 rounded-md bg-purple-600 text-white px-3 py-2 font-bold"
+          className="mx-2 rounded-md bg-blue-600 text-white px-3 py-2 font-bold"
           onClick={() => navigate("/support/add")}
         >
           + Add Support
@@ -109,7 +109,7 @@ const Support = () => {
         ) : members.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-nowrap text-left">
-              <thead className="bg-purple-600 font-bold text-white text-nowrap">
+              <thead className="bg-blue-600 font-bold text-white text-nowrap">
                 <tr>
                   <th className="text-nowrap px-4 py-2">Name</th>
                   <th className="text-nowrap px-4 py-2">Phone Number</th>
@@ -201,7 +201,7 @@ const Support = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-md"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md"
                 >
                   Save
                 </button>

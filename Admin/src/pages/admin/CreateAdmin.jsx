@@ -147,7 +147,7 @@ const handleSubmit = async (e) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-purple-500 text-white rounded-md mt-6"
+            className="w-full py-2 bg-blue-500 text-white rounded-md mt-6"
           >
             {loading ? "Submitting..." : "Submit"}
           </button>

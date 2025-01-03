@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Layout from "../../components/layout/Layout";
+import toast from "react-hot-toast";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -29,9 +30,9 @@ const ComplaintDashboard = () => {
       }
       const data = await response.json();
       setComplaints(data.complaints);
-      alert(`Fetched ${data.complaints.length} complaints`);
+      toast.success(`Fetched ${data.complaints.length} complaints`);
     } catch (error) {
-      alert("Failed to fetch complaints");
+      toast.error("Failed to fetch complaints");
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,6 @@ const ComplaintDashboard = () => {
       if (!response.ok) {
         throw new Error("Failed to update complaint status");
       }
-      alert(`Complaint status updated to ${newStatus} successfully`);
       setComplaints(
         complaints.map((c) =>
           c._id === complaintId ? { ...c, status: newStatus } : c
@@ -78,7 +78,7 @@ const ComplaintDashboard = () => {
       );
       setSelectedComplaint({ ...selectedComplaint, status: newStatus });
     } catch (error) {
-      alert(`Failed to update complaint status`);
+      toast.error(error.message);
     }
   };
 
@@ -86,7 +86,7 @@ const ComplaintDashboard = () => {
     <Layout>
       <div className="container mx-auto ">
         <div className="bg-white shadow-md rounded-lg p-2">
-          <h1 className="text-3xl font-bold text-purple-800 mb-6">
+          <h1 className="text-3xl font-bold text-blue-800 mb-6">
             Complaints Dashboard
           </h1>
           <div className="mb-6">
@@ -96,7 +96,7 @@ const ComplaintDashboard = () => {
                 placeholder="Search complaints..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"
@@ -114,13 +114,13 @@ const ComplaintDashboard = () => {
 
           {loading ? (
             <div className="text-center py-10">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
-              <p className="mt-2 text-purple-600">Loading complaints...</p>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              <p className="mt-2 text-blue-600">Loading complaints...</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-purple-600">
+                <thead className="bg-blue-600">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                       Type
@@ -177,7 +177,7 @@ const ComplaintDashboard = () => {
                               setSelectedComplaint(complaint);
                               setIsModalOpen(true);
                             }}
-                            className="text-purple-600 hover:text-purple-900"
+                            className="text-blue-600 hover:text-blue-900"
                           >
                             View
                           </button>
@@ -203,7 +203,7 @@ const ComplaintDashboard = () => {
         {isModalOpen && selectedComplaint && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-              <h2 className="text-2xl font-bold text-purple-800 mb-4">
+              <h2 className="text-2xl font-bold text-blue-800 mb-4">
                 Complaint Details
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -299,21 +299,42 @@ const ComplaintDashboard = () => {
               <div className="mb-4">
                 <p className="font-semibold mb-2">Change Status:</p>
                 <div className="flex space-x-2">
-                  {["Pending", "Solved", "Rejected"].map((status) => (
-                    <button
-                      key={status}
-                      onClick={() =>
-                        handleStatusChange(selectedComplaint._id, status)
-                      }
-                      className={`px-4 py-2 rounded-md transition duration-300 ${
-                        selectedComplaint.status === status
-                          ? "bg-purple-600 text-white"
-                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                      }`}
-                    >
-                      {status}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() =>
+                      handleStatusChange(selectedComplaint._id, "Pending")
+                    }
+                    className={`px-4 py-2 rounded-md transition duration-300 ${
+                      selectedComplaint.status === "Pending"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                  >
+                    Pending
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleStatusChange(selectedComplaint._id, "Solved")
+                    }
+                    className={`px-4 py-2 rounded-md transition duration-300 ${
+                      selectedComplaint.status === "Solved"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                  >
+                    Solved
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleStatusChange(selectedComplaint._id, "Rejected")
+                    }
+                    className={`px-4 py-2 rounded-md transition duration-300 ${
+                      selectedComplaint.status === "Rejected"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                  >
+                    Rejected
+                  </button>
                 </div>
               </div>
               <div className="flex justify-end mt-6">

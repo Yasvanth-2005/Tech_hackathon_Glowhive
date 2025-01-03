@@ -17,6 +17,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchComplaints } from "./store/complaintsSlice";
 import { fetchUsers } from "./store/userSlice";
 import { useLocation, useNavigate } from "react-router-dom";
+import Users from "./pages/users/Users";
+import Criticals from "./pages/criticals/Criticals";
 
 const ProtectedRoute = ({ user, children }) => {
   return user ? children : <Login />;
@@ -36,10 +38,7 @@ const App = () => {
       navigate(`/${redirectPage}`);
     }
 
-    if (user) {
-      dispatch(fetchComplaints());
-      dispatch(fetchUsers());
-    }
+  
   }, [location, navigate, user, dispatch]);
 
   return (
@@ -80,6 +79,14 @@ const App = () => {
           }
         />
         <Route
+          path="/criticals"
+          element={
+            <ProtectedRoute user={user}>
+              <Criticals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/create"
           element={
             <ProtectedRoute user={user}>
@@ -116,6 +123,14 @@ const App = () => {
           element={
             <ProtectedRoute user={user}>
               <SOS />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/users"
+          element={
+            <ProtectedRoute user={user}>
+              <Users />
             </ProtectedRoute>
           }
         />

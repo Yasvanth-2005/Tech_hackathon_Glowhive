@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../../store/authSlice";
 import { toast } from "react-hot-toast";
+import { FaUsers } from "react-icons/fa";
+
 import {
   MdSpaceDashboard,
   MdNotificationsActive,
@@ -30,13 +32,13 @@ const Breadcrumb = () => {
             <li key={index} className="flex items-center space-x-2">
               {index > 0 && <span className="text-gray-400">/</span>}
               {isLast ? (
-                <span className="text-lg font-semibold text-purple-600 capitalize">
+                <span className="text-lg font-semibold text-blue-600 capitalize">
                   {segment}
                 </span>
               ) : (
                 <Link
                   to={path}
-                  className="hover:text-purple-600 text-lg font-semibold capitalize"
+                  className="hover:text-blue-600 text-lg font-semibold capitalize"
                 >
                   {segment}
                 </Link>
@@ -62,9 +64,11 @@ const Layout = ({ children }) => {
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
     { label: "Notifications", path: "notifications", icon: MdNotificationsActive },
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
+    { label: "Users", path: "users", icon: FaUsers },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },
     { label: "Support", path: "support", icon: FaPersonBreastfeeding },
     { label: "SOS", path: "sos", icon: IoAlertCircle },
+
   ];
 
   const isActive = (path) => location.pathname.includes(path);
@@ -112,7 +116,7 @@ const Layout = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           <div className="p-4 border-b">
-            <Link to="/" className="text-2xl font-bold text-purple-600">
+            <Link to="/" className="text-2xl font-bold text-blue-600">
               Girl Grievance
             </Link>
           </div>
@@ -121,8 +125,8 @@ const Layout = ({ children }) => {
               <Link
                 key={index}
                 to={`/${item.path}`}
-                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-purple-100 hover:text-purple-600 rounded-lg transition-colors duration-200 ${
-                  isActive(item.path) ? "bg-purple-100 text-purple-600" : ""
+                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600 rounded-lg transition-colors duration-200 ${
+                  isActive(item.path) ? "bg-blue-100 text-blue-600" : ""
                 }`}
               >
                 <item.icon className="w-5 h-5 mr-3" />
@@ -133,7 +137,7 @@ const Layout = ({ children }) => {
           <div className="p-4 border-t">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-purple-100 hover:text-purple-600 rounded-lg transition-colors duration-200"
+              className="w-full flex items-center justify-center px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-blue-600 rounded-lg transition-colors duration-200"
             >
               <MdLogout className="w-5 h-5 mr-2" />
               Logout
@@ -158,7 +162,7 @@ const Layout = ({ children }) => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center  space-x-2 focus:outline-none"
               >
-                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
                   {user?.username?.charAt(0) || "U"}
                 </div>
                 <span className="hidden md:block text-gray-700">
@@ -168,7 +172,7 @@ const Layout = ({ children }) => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                   <button
-                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-purple-50 flex items-center"
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-50 flex items-center"
                     onClick={() => {
                       // Handle view profile
                       setIsDropdownOpen(false);
@@ -179,7 +183,7 @@ const Layout = ({ children }) => {
                   </button>
                   <div className="h-px bg-gray-200 my-1" />
                   <button
-                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-purple-50 flex items-center"
+                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-50 flex items-center"
                     onClick={() => {
                       handleLogout();
                       setIsDropdownOpen(false);

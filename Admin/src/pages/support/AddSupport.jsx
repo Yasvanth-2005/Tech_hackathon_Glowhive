@@ -9,6 +9,7 @@ const AddSupport = () => {
     name: "",
     phno: "",
     position: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -44,6 +45,7 @@ const AddSupport = () => {
           name: "",
           phno: "",
           position: "",
+          password: "",
         });
       } else {
         const message =
@@ -112,12 +114,26 @@ const AddSupport = () => {
           />
           <br />
 
+          <label htmlFor="password" className="text-black font-semibold">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter the password"
+            required
+            className="border border-gray-500 rounded-md p-2 w-full placeholder:text-gray-500"
+          />
+          <br />
+
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-purple-500 text-white rounded-md mt-6"
+            className="w-full py-2 bg-blue-500 text-white rounded-md mt-6"
           >
             {loading ? "Adding..." : "Add Support Member"}
           </button>

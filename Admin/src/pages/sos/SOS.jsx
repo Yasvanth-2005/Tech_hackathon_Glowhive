@@ -106,7 +106,7 @@ const SOS = () => {
       <div className="w-full flex flex-wrap items-center justify-between">
         <h1 className="text-2xl font-bold mb-4 md:mb-0">SOS List</h1>
         <button
-          className="mx-2 rounded-md bg-purple-600 text-white px-3 py-2 font-bold"
+          className="mx-2 rounded-md bg-blue-600 text-white px-3 py-2 font-bold"
           onClick={() => navigate("/SOS/new")}
         >
           + Add SOS
@@ -120,7 +120,7 @@ const SOS = () => {
             {/* Responsive table container */}
             <table className="table-auto w-full border-collapse border border-gray-300">
               <thead>
-                <tr className="bg-purple-600 text-white font-bold">
+                <tr className="bg-blue-600 text-white font-bold">
                   <th className="px-4 py-2 text-left">Sno</th>
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Email</th>

@@ -1,120 +1,231 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Layout from "../../components/layout/Layout";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { MdDashboard, MdPeople, MdReport, MdCheckCircle } from "react-icons/md";
+import axios from "axios";
+
+const StatCard = ({ title, count, icon: Icon, bgColor, loading }) => (
+  <div
+    className={`p-6 rounded-lg shadow-md transition-transform transform hover:scale-105 flex items-center ${bgColor}`}
+  >
+    {loading ? (
+      <div className="animate-pulse flex-1">
+        <div className="h-6 bg-gray-300 rounded w-1/3 mb-2"></div>
+        <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+      </div>
+    ) : (
+      <div className="flex items-center justify-between w-full">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-200 mb-1">{title}</h2>
+          <p className="text-2xl font-bold text-white">{count}</p>
+        </div>
+        <Icon className="text-3xl text-white opacity-80" />
+      </div>
+    )}
+  </div>
+);
 
 const Dashboard = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const user = useSelector((state) => state.auth.user.admin);
+  const tokenData = useSelector((state) => state.auth.user);
   const [searchTerm, setSearchTerm] = useState("");
-  const [complaints,setComplaints] = useState(null)
-  const [usersCount,setUsersCount] = useState(null)
+  const [complaints, setComplaints] = useState([]);
 
-  const data = [
-    { id: 1, complaint_name: "Cleanliness", status: "pending" },
-    { id: 2, complaint_name: "Noise Pollution", status: "rejected" },
-    { id: 3, complaint_name: "Water Supply", status: "solved" },
-    { id: 4, complaint_name: "Electricity Issue", status: "pending" },
-  ];
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    solved: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const filteredData = data.filter(item =>
-    item.complaint_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/complaints/admin`, {
+          headers: { Authorization: `Bearer ${tokenData?.token}` },
+        });
+        const fetchedComplaints = response.data.complaints;
 
-  const StatCard = ({ title, count, icon: Icon }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-purple-100 transition-all duration-300 hover:shadow-lg hover:border-purple-300">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-purple-600 mb-2">{title}</h2>
-          <p className="text-3xl font-bold text-purple-800">{count}</p>
-        </div>
-        <Icon className="text-4xl text-purple-500 opacity-80" />
-      </div>
-    </div>
+        const criticalComplaints = fetchedComplaints.filter(
+          (complaint) => complaint.isCritical
+        );
+
+        const total = criticalComplaints.length;
+        const pending = criticalComplaints.filter(
+          (complaint) => complaint.status.toLowerCase() === "pending"
+        ).length;
+        const solved = criticalComplaints.filter(
+          (complaint) => complaint.status.toLowerCase() === "solved"
+        ).length;
+
+        setComplaints(criticalComplaints);
+        setStats({ total, pending, solved });
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching complaints:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchComplaints();
+  }, []);
+
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const filteredData = complaints.filter((item) =>
+    item.statement.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <Layout>
-      <div className="dashboard bg-gray-100 p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-purple-800 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user.username}!</p>
-        </div>
+      <div className="dashboard bg-gray-100 p-2 min-h-screen">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+          <p className="text-sm text-gray-600">
+            Welcome back, {user.username}!
+          </p>
+        </header>
 
-        <div className="grid gap-8 mb-8 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard title="Total Users" count="10" icon={MdPeople} />
-          <StatCard title="Total Complaints" count="20" icon={MdReport} />
-          <StatCard title="Pending Complaints" count="12" icon={MdDashboard} />
-          <StatCard title="Solved Complaints" count="8" icon={MdCheckCircle} />
-        </div>
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <StatCard
+            title="Total Critical Complaints"
+            count={stats.total}
+            icon={MdReport}
+            bgColor="bg-red-500"
+            loading={loading}
+          />
+          <StatCard
+            title="Pending Complaints"
+            count={stats.pending}
+            icon={MdDashboard}
+            bgColor="bg-yellow-500"
+            loading={loading}
+          />
+          <StatCard
+            title="Solved Complaints"
+            count={stats.solved}
+            icon={MdCheckCircle}
+            bgColor="bg-green-500"
+            loading={loading}
+          />
+        </section>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-purple-800 mb-4 md:mb-0">Recent Complaints</h2>
+        <section className="bg-white my-3 shadow-md rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Admin Profile
+          </h2>
+          <div className="flex items-center">
+            <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center mr-6">
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="text-4xl text-gray-400" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-800">
+                {user.username}
+              </h3>
+              <p className="text-sm text-gray-600">{user.email}</p>
+              <p className="text-sm text-gray-700">
+                Role:{" "}
+                <span className="font-semibold text-gray-800">{user.role}</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white shadow-md rounded-lg p-6 mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Critical Complaints
+            </h2>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search complaints..."
-                className="pl-10 pr-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring focus:ring-blue-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complaint</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">{item.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{item.complaint_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        item.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        item.status === 'solved' ? 'bg-green-100 text-green-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-purple-800 mb-6">Admin Profile</h2>
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="w-32 h-32 bg-purple-200 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-6">
-              {user.avatar ? (
-                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                <FaUserCircle className="w-24 h-24 text-purple-600" />
-              )}
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-purple-600">{user.username}</h3>
-              <p className="text-gray-600 mb-2">{user.email}</p>
-              <p className="text-gray-700">
-                Role: <span className="font-semibold">{user.role}</span>
-              </p>
-            </div>
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="animate-pulse">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-10 bg-gray-300 rounded mb-3 w-full"
+                  ></div>
+                ))}
+              </div>
+            ) : (
+              <table className="min-w-full bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      Statement
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      Created At
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                      Updated At
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredData.map((item) => (
+                    <tr key={item._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {item.statement}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {item.category}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {item.status}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {formatDate(item.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {formatDate(item.updatedAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-        </div>
+        </section>
       </div>
     </Layout>
   );
 };
 
 export default Dashboard;
-

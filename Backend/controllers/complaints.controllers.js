@@ -126,7 +126,7 @@ export const getAllComplaints = async (req, res) => {
       tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
 
       filter = {
-        createdAt: { $lt: tenDaysAgo }, // Complaints older than 10 days
+        $or: [{ isCritical: true }, { createdAt: { $lt: tenDaysAgo } }],
       };
     } else if (role !== "Warden") {
       // Other roles: Complaints within their respective roleDaysMapping time frame

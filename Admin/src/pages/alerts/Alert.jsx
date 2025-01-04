@@ -9,6 +9,7 @@ import Layout from "../../components/layout/Layout";
 const Alert = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken");
 
   const [alertsData, setAlertsData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ const Alert = () => {
     try {
       const response = await axios.get(`${apiUrl}/sos/alerts`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -74,7 +75,7 @@ const Alert = () => {
         { status: newStatus },
         {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

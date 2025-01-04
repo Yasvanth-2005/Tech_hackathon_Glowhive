@@ -13,6 +13,7 @@ const AddSOS = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken")
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -34,7 +35,7 @@ const AddSOS = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

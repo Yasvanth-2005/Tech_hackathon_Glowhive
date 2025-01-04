@@ -6,6 +6,7 @@ import Layout from "../../components/layout/Layout";
 
 const CreateNotification = () => {
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -59,7 +60,7 @@ const CreateNotification = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

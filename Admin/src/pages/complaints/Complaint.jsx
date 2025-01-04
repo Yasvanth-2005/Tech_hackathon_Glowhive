@@ -18,12 +18,13 @@ const ComplaintDashboard = () => {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken");
 
   const fetchComplaints = async () => {
     try {
       setLoading(true);
       const response = await fetch(`${apiUrl}/complaints/admin`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) {
         throw new Error("Failed to fetch complaints");
@@ -63,7 +64,7 @@ const ComplaintDashboard = () => {
       const response = await fetch(`${apiUrl}/complaints/${complaintId}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ status: newStatus }),

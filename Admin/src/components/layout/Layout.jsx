@@ -5,7 +5,7 @@ import { signOut } from "../../store/authSlice";
 import { toast } from "react-hot-toast";
 import { FaUsers } from "react-icons/fa";
 import { RiAlertFill } from "react-icons/ri";
-import logo from '../../assets/logo.png'
+import logo from "../../assets/logo.png";
 
 import {
   MdSpaceDashboard,
@@ -64,14 +64,17 @@ const Layout = ({ children }) => {
 
   const sidebarItems = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
-    { label: "Notifications", path: "notifications", icon: MdNotificationsActive },
+    {
+      label: "Notifications",
+      path: "notifications",
+      icon: MdNotificationsActive,
+    },
     { label: "Alerts", path: "alerts", icon: RiAlertFill },
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
     { label: "Users", path: "users", icon: FaUsers },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },
     { label: "Support", path: "support", icon: FaPersonBreastfeeding },
     { label: "SOS", path: "sos", icon: IoAlertCircle },
-
   ];
 
   const isActive = (path) => location.pathname.includes(path);
@@ -119,10 +122,12 @@ const Layout = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           <div className="p-4 ">
-            <Link to="/" className="flex text-2xl items-center gap-2 font-bold text-blue-600">
-              <img src={logo} className="w-[50px] h-[50px]"  />
+            <Link
+              to="/"
+              className="flex text-2xl items-center gap-2 font-bold text-blue-600"
+            >
+              <img src={logo} className="w-[50px] h-[50px]" />
               <span class="font">Girl Grievance </span>
-             
             </Link>
           </div>
           <nav className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -162,12 +167,12 @@ const Layout = ({ children }) => {
             >
               <MdMenu className="w-6 h-6" />
             </button>
-            
+
             <div className="relative " ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 focus:outline-none"
-              >  
+              >
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
                   {user?.username?.charAt(0) || "U"}
                 </div>
@@ -177,16 +182,6 @@ const Layout = ({ children }) => {
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <button
-                    className="w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-50 flex items-center"
-                    onClick={() => {
-                      // Handle view profile
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    <MdPerson className="w-4 h-4 mr-2" />
-                    View Profile
-                  </button>
                   <div className="h-px bg-gray-200 my-1" />
                   <button
                     className="w-full px-4 py-2 text-left text-gray-700 hover:bg-blue-50 flex items-center"
@@ -225,4 +220,3 @@ const Layout = ({ children }) => {
 };
 
 export default Layout;
-

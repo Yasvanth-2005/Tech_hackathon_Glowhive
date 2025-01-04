@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
+import { ClipLoader } from "react-spinners"; // React spinner loader
 
 // Import Pages
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -24,15 +25,8 @@ import Alert from "./pages/alerts/Alert";
 // Redux Actions
 import { signInSuccess } from "./store/authSlice";
 
-// Protected Route Component
-const ProtectedRoute = ({ user, children }) => {
-  if (!user) {
-    return <Login />;
-  }
-  return children;
-};
-
 const App = () => {
+  const [loading, setLoading] = useState(true); // Loading state
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const location = useLocation();
@@ -46,28 +40,32 @@ const App = () => {
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.warn("No token found, redirecting to login.");
+        setLoading(false); // Stop loading if no token
         navigate("/");
         return;
       }
 
       try {
-        const response = await axios.get(`${apiUrl}/admin/getdetails`, {
+        const response = await axios.get(`${apiUrl}/admin`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         if (response.status === 200 && response.data) {
+          console.log(response.data);
           dispatch(signInSuccess(response.data)); // Update user in Redux
         } else {
           console.error("Invalid response or no user data found.");
           localStorage.removeItem("authToken");
-          navigate("/");
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("Error fetching user details:", error.message);
         localStorage.removeItem("authToken");
         navigate("/");
+      } finally {
+        setLoading(false); // Stop loading after API call
       }
     };
 
@@ -83,115 +81,33 @@ const App = () => {
     }
   }, [location, navigate]);
 
+  if (loading) {
+    // Display loading spinner
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={50} color="#3498db" />
+      </div>
+    );
+  }
+
   return (
     <>
       <Toaster />
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute user={user}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute user={user}>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications/create"
-          element={
-            <ProtectedRoute user={user}>
-              <CreateNotification />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/alerts"
-          element={
-            <ProtectedRoute user={user}>
-              <Alert />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute user={user}>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/criticals"
-          element={
-            <ProtectedRoute user={user}>
-              <Criticals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/create"
-          element={
-            <ProtectedRoute user={user}>
-              <CreateAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/complaint"
-          element={
-            <ProtectedRoute user={user}>
-              <Complaint />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <ProtectedRoute user={user}>
-              <Support />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support/add"
-          element={
-            <ProtectedRoute user={user}>
-              <AddSupport />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sos"
-          element={
-            <ProtectedRoute user={user}>
-              <SOS />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute user={user}>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sos/new"
-          element={
-            <ProtectedRoute user={user}>
-              <AddSOS />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/notifications/create" element={<CreateNotification />} />
+        <Route path="/alerts" element={<Alert />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/criticals" element={<Criticals />} />
+        <Route path="/admin/create" element={<CreateAdmin />} />
+        <Route path="/complaint" element={<Complaint />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/support/add" element={<AddSupport />} />
+        <Route path="/sos" element={<SOS />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/sos/new" element={<AddSOS />} />
       </Routes>
     </>
   );

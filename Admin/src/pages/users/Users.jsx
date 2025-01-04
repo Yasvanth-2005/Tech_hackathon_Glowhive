@@ -9,6 +9,7 @@ import Layout from "../../components/layout/Layout";
 const Users = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken")
 
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ const Users = () => {
     try {
       const response = await axios.get(`${apiUrl}/user/all`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

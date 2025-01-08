@@ -14,13 +14,14 @@ const Support = () => {
   const [formData, setFormData] = useState({ name: "", phno: "", position: "" });
   const apiUrl = import.meta.env.VITE_API_URL;
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken")
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/support`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -42,7 +43,7 @@ const Support = () => {
     try {
       const response = await axios.delete(`${apiUrl}/support/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.status === 200) {
@@ -67,7 +68,7 @@ const Support = () => {
     try {
       const response = await axios.patch(`${apiUrl}/support/edit/${id}`, formData, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.status === 200) {

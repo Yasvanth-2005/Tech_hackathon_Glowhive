@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { Toaster } from "react-hot-toast";
+import { ClipLoader } from "react-spinners"; // React spinner loader
+
+// Import Pages
 import Dashboard from "./pages/dashboard/Dashboard";
 import Login from "./auth/Login";
 import Notifications from "./pages/notifications/Notifications";
@@ -8,140 +14,100 @@ import Admin from "./pages/admin/Admin";
 import CreateAdmin from "./pages/admin/CreateAdmin";
 import Complaint from "./pages/complaints/Complaint";
 import CreateNotification from "./pages/notifications/CreateNotification";
-import { Toaster } from "react-hot-toast";
 import Support from "./pages/support/Support";
 import AddSupport from "./pages/support/AddSupport";
 import SOS from "./pages/sos/SOS";
 import AddSOS from "./pages/sos/AddSOS";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchComplaints } from "./store/complaintsSlice";
-import { fetchUsers } from "./store/userSlice";
-import { useLocation, useNavigate } from "react-router-dom";
 import Users from "./pages/users/Users";
 import Criticals from "./pages/criticals/Criticals";
+import Alert from "./pages/alerts/Alert";
 
-const ProtectedRoute = ({ user, children }) => {
-  return user ? children : <Login />;
-};
+// Redux Actions
+import { signInSuccess } from "./store/authSlice";
 
 const App = () => {
+  const [loading, setLoading] = useState(true); // Loading state
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  // Fetch User Details from API
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.warn("No token found, redirecting to login.");
+        setLoading(false); // Stop loading if no token
+        navigate("/");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${apiUrl}/admin`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 200 && response.data) {
+          console.log(response.data);
+          dispatch(signInSuccess(response.data)); // Update user in Redux
+        } else {
+          console.error("Invalid response or no user data found.");
+          localStorage.removeItem("authToken");
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error.message);
+        localStorage.removeItem("authToken");
+        navigate("/");
+      } finally {
+        setLoading(false); // Stop loading after API call
+      }
+    };
+
+    fetchUserDetails();
+  }, [dispatch, navigate, apiUrl]);
+
+  // Handle Redirects based on URL Parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const redirectPage = params.get("redirect");
-
     if (redirectPage) {
       navigate(`/${redirectPage}`);
     }
+  }, [location, navigate]);
 
-  
-  }, [location, navigate, user, dispatch]);
+  if (loading) {
+    // Display loading spinner
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={50} color="#3498db" />
+      </div>
+    );
+  }
 
   return (
     <>
       <Toaster />
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute user={user}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute user={user}>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications/create"
-          element={
-            <ProtectedRoute user={user}>
-              <CreateNotification />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute user={user}>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/criticals"
-          element={
-            <ProtectedRoute user={user}>
-              <Criticals />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/create"
-          element={
-            <ProtectedRoute user={user}>
-              <CreateAdmin />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/complaint"
-          element={
-            <ProtectedRoute user={user}>
-              <Complaint />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <ProtectedRoute user={user}>
-              <Support />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/support/add"
-          element={
-            <ProtectedRoute user={user}>
-              <AddSupport />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sos"
-          element={
-            <ProtectedRoute user={user}>
-              <SOS />
-            </ProtectedRoute>
-          }
-        />
-         <Route
-          path="/users"
-          element={
-            <ProtectedRoute user={user}>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sos/new"
-          element={
-            <ProtectedRoute user={user}>
-              <AddSOS />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/notifications/create" element={<CreateNotification />} />
+        <Route path="/alerts" element={<Alert />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/criticals" element={<Criticals />} />
+        <Route path="/admin/create" element={<CreateAdmin />} />
+        <Route path="/complaint" element={<Complaint />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/support/add" element={<AddSupport />} />
+        <Route path="/sos" element={<SOS />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/sos/new" element={<AddSOS />} />
       </Routes>
     </>
   );

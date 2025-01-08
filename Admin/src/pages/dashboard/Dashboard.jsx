@@ -28,8 +28,8 @@ const StatCard = ({ title, count, icon: Icon, bgColor, loading }) => (
 
 const Dashboard = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem("authToken");
   const user = useSelector((state) => state.auth.user.admin);
-  const tokenData = useSelector((state) => state.auth.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [complaints, setComplaints] = useState([]);
 
@@ -44,7 +44,7 @@ const Dashboard = () => {
     const fetchComplaints = async () => {
       try {
         const response = await axios.get(`${apiUrl}/complaints/admin`, {
-          headers: { Authorization: `Bearer ${tokenData?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const fetchedComplaints = response.data.complaints;
 

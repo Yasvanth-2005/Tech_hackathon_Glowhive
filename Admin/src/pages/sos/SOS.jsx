@@ -13,6 +13,7 @@ const SOS = () => {
   const [editFormData, setEditFormData] = useState({ phno: "", email: "", name: "" });
   const [currentEditId, setCurrentEditId] = useState(null);
   const user = useSelector((state) => state.auth.user);
+  const token = localStorage.getItem("authToken")
   const apiUrl = import.meta.env.VITE_API_URL;
 
   // Fetch SOS data
@@ -21,7 +22,7 @@ const SOS = () => {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/sos`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -44,7 +45,7 @@ const SOS = () => {
     try {
       const response = await axios.delete(`${apiUrl}/sos/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -79,7 +80,7 @@ const SOS = () => {
     try {
       const response = await axios.patch(`${apiUrl}/sos/edit/${currentEditId}`, editFormData, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

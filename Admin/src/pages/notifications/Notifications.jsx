@@ -21,6 +21,7 @@ const Notifications = () => {
     links: "",
     sender:user.admin._id
   });
+  const token = localStorage.getItem("authToken");
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -28,7 +29,7 @@ const Notifications = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${apiUrl}/notifications`, {
-        headers: { Authorization: `Bearer ${user?.token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.status === 200) {
@@ -77,7 +78,7 @@ const Notifications = () => {
       const response = await axios.delete(
         `${apiUrl}/notifications/delete/${notificationId}`,
         {
-          headers: { Authorization: `Bearer ${user?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       if (response.status === 200) {
@@ -126,7 +127,7 @@ const Notifications = () => {
         `${apiUrl}/notifications/edit/${selectedNotification._id}`,
         payload,
         {
-          headers: { Authorization: `Bearer ${user?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 

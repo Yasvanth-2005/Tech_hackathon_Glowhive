@@ -9,6 +9,8 @@ import Layout from "../../components/layout/Layout";
 const Admin = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+
+  const token = localStorage.getItem("authToken");
   
   const [adminsData, setAdminsData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ const Admin = () => {
     try {
       const response = await axios.get(`${apiUrl}/admin/admins`, {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { signInStart, signInSuccess } from "../store/authSlice";
-import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 const Login = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,16 +19,11 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // Handling form submission
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      email,
-      password,
-    };
-    dispatch(signInStart());
-
+    const payload = { email, password };
     setLoading(true);
     setError("");
 
@@ -40,8 +32,8 @@ const Login = () => {
 
       if (response.status === 200) {
         toast.success("Login successful!");
-        console.log("Login successful", response.data);
-        dispatch(signInSuccess(response.data));
+        const { token } = response.data; // Assuming the token is in the response
+        localStorage.setItem("authToken", token); // Save the token to localStorage
         navigate("/dashboard");
       } else {
         const message = response.data?.message || "Login failed.";
@@ -125,7 +117,7 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              disabled={loading} // Disable the button while loading
+              disabled={loading}
               className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {loading ? "Logging in..." : "Log In"}

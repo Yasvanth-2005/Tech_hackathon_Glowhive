@@ -18,6 +18,7 @@ const CreateAdmin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const token = localStorage.getItem("authToken");
 
   const apiUrl = import.meta.env.VITE_API_URL; 
 
@@ -43,7 +44,7 @@ const handleSubmit = async (e) => {
       formData,
       {
         headers: {
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );

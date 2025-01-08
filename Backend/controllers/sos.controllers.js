@@ -4,7 +4,7 @@ import User from "../models/user.model.js";
 
 export const getAllSOSGlobal = async (req, res) => {
   try {
-    const allsos = await SOS.find();
+    const allsos = await SOS.find().select("-password");
 
     if (!allsos) {
       return res.status(404).json({ message: "Suport Staff data Not Found" });

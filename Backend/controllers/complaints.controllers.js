@@ -129,7 +129,6 @@ export const getAllComplaints = async (req, res) => {
         $or: [{ isCritical: true }, { createdAt: { $lt: tenDaysAgo } }],
       };
     } else if (role !== "Warden") {
-      // Other roles: Complaints within their respective roleDaysMapping time frame
       const days = roleDaysMapping[role];
       const daysAgo = new Date();
       daysAgo.setDate(daysAgo.getDate() - days);

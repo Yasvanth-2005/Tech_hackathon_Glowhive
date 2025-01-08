@@ -41,18 +41,81 @@ export const sendMessage = async (req, res) => {
 export const fetchChats = async (req, res) => {
   const faculty = req.faculty;
 
+  if (!faculty) {
+    return res.status(400).json({ error: "Faculty ID is required" });
+  }
+
   try {
-    const usersWithLastMessage = await Message.aggregate([
+    console.log("Faculty ID:", faculty);
+
+    const chats = await Message.find({
+      $or: [{ sender: faculty }, { receiver: faculty }],
+    });
+
+    console.log(chats);
+
+    const groupedChats = await Message.aggregate([
       {
         $match: {
           $or: [{ sender: faculty }, { receiver: faculty }],
         },
       },
+      {
+        $addFields: {
+          otherUser: {
+            $cond: [{ $eq: ["$sender", faculty] }, "$receiver", "$sender"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$otherUser",
+          chats: {
+            $push: {
+              message: "$message",
+              createdAt: "$createdAt",
+              sender: "$sender",
+              receiver: "$receiver",
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          otherUser: "$_id",
+          chats: 1,
+          userDetails: { username: 1, role: 1 },
+        },
+      },
     ]);
 
-    res.status(200).json(usersWithLastMessage);
+    if (groupedChats.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No chats found for the faculty" });
+    }
+
+    // Transform the grouped result into the desired format
+    const chatsByUser = groupedChats.reduce((acc, chatGroup) => {
+      acc[chatGroup.otherUser] = {
+        chats: chatGroup.chats,
+        userDetails: chatGroup.userDetails[0] || null,
+      };
+      return acc;
+    }, {});
+
+    res.status(200).json({ chats: chatsByUser });
   } catch (err) {
-    console.error("Error fetching users and their last messages:", err);
+    console.error("Error fetching grouped chats:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -39,25 +39,25 @@ export const postNotification = async (req, res) => {
       "username role"
     );
 
-    // OneSignal API call
-    // const oneSignalResponse = await axios.post(
-    //  "https://onesignal.com/api/v1/notifications",
-    //  {
-    //    app_id: process.env.ONESIGNAL_APP_ID,
-    //    included_segments: ["Subscribed Users"],
-    //    headings: { en: title },
-    //    contents: { en: description },
-    //    data: { links },
-    //  },
-    //  {
-    //    headers: {
-    //       "Content-Type": "application/json",
-    //      Authorization: `Basic ${process.env.ONESIGNAL_API_KEY}`,
-    //    },
-    //  }
-    //);
+    const oneSignalResponse = await axios.post(
+      "https://onesignal.com/api/v1/notifications",
+      {
+        app_id: process.env.ONESIGNAL_APP_ID,
+        included_segments: ["Subscribed Users"],
+        headings: { en: title },
+        contents: { en: description },
+        data: { links },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${process.env.ONESIGNAL_API_KEY}`,
+        },
+      }
+    );
+    console.log("test 2");
 
-    // console.log("OneSignal response:", oneSignalResponse.data);
+    console.log("OneSignal response:", oneSignalResponse.data);
 
     return res.status(201).json({
       notification: populatedNotification,

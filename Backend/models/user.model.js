@@ -53,6 +53,11 @@ const UserSchema = new mongoose.Schema(
       required: [true, "Primary SOS phone number is required"],
       match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
     },
+    userType: {
+      type: String,
+      enum: ["user", "staff"],
+      default: "user",
+    },
   },
   {
     timestamps: true,

@@ -18,6 +18,7 @@ export const verifyUserToken = async (req, res, next) => {
     }
 
     req.user = decodedToken.userId;
+    req.type = decodedToken.type;
     next();
   } catch (error) {
     console.log(error.message);

@@ -339,7 +339,7 @@ export const sendOtp = async (req, res) => {
       return res.status(409).json({ message: "Email already exists" });
     }
 
-    const otp = crypto.randomInt(100000, 999999).toString();
+    const otp = crypto.randomInt(10000, 99999).toString();
 
     const existingOtp = await Otp.findOne({ email: email.toLowerCase() });
     if (existingOtp) {

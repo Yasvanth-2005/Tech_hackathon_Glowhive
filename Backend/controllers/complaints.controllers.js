@@ -16,6 +16,7 @@ export const sendComplaint = async (req, res) => {
     harasserType,
     img,
     video,
+    section,
   } = req.body;
 
   const finalUserId = userId?.trim() ? userId : null;
@@ -35,6 +36,7 @@ export const sendComplaint = async (req, res) => {
       victinDetails,
       harasserDetails,
       harasserType,
+      section,
     });
 
     if (!complaint) {
@@ -105,39 +107,51 @@ export const getAllComplaints = async (req, res) => {
   console.log("User Role:", role);
 
   const roleDaysMapping = {
-    HOD: 10,
-    DSW: 7,
-    AO: 3,
-    Warden: 0,
+    Hostel: {
+      Warden: 0,
+      AO: 3,
+      DSW: 7,
+      VC: 10,
+    },
+    Academics: {
+      HOD: 0,
+      VC: 5,
+    },
   };
 
-  if (!roleDaysMapping.hasOwnProperty(role)) {
+  // Validate role for both sections
+  const isRoleValid = Object.values(roleDaysMapping).some((mapping) =>
+    Object.keys(mapping).includes(role)
+  );
+
+  if (!isRoleValid) {
     return res
       .status(403)
       .json({ message: "You are not allowed to see this data" });
   }
 
   try {
-    let filter = {};
+    // Prepare the filter for complaints
+    let filters = [];
 
-    if (role === "HOD") {
-      // HOD: Complaints 10 days old or more
-      const tenDaysAgo = new Date();
-      tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+    // Loop through each section and apply filters based on the role's mapping
+    for (const [section, mapping] of Object.entries(roleDaysMapping)) {
+      if (mapping[role] !== undefined) {
+        const days = mapping[role];
+        const dateLimit = new Date();
+        dateLimit.setDate(dateLimit.getDate() - days);
 
-      filter = {
-        $or: [{ isCritical: true }, { createdAt: { $lt: tenDaysAgo } }],
-      };
-    } else if (role !== "Warden") {
-      const days = roleDaysMapping[role];
-      const daysAgo = new Date();
-      daysAgo.setDate(daysAgo.getDate() - days);
-
-      filter = {
-        $or: [{ isCritical: true }, { createdAt: { $gte: daysAgo } }],
-      };
+        filters.push({
+          section,
+          $or: [{ isCritical: true }, { createdAt: { $gte: dateLimit } }],
+        });
+      }
     }
 
+    // Combine all filters with `$or`
+    const filter = { $or: filters };
+
+    // Fetch complaints based on the constructed filter
     const complaints = await Complaints.find(filter)
       .populate("userId", "email username phno collegeId")
       .sort({ createdAt: -1 });

@@ -33,6 +33,7 @@ const ComplaintUserSchema = new mongoose.Schema(
     isAnonymus: { type: Boolean, default: false },
     location: { type: String },
     time: { type: String },
+    section:{type:String,enum:["Academics","Hostel"],default:"Hostel"}
   },
   {
     timestamps: true,

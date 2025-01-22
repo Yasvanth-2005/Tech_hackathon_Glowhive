@@ -10,9 +10,7 @@ import adminRoutes from "./routes/admin.route.js";
 import userRoutes from "./routes/user.route.js";
 import complaintsRoutes from "./routes/complaints.route.js";
 import notificationRoutes from "./routes/notifications.route.js";
-import supportRoutes from "./routes/support.route.js";
 import sosRoutes from "./routes/sos.route.js";
-import messageRoutes from "./routes/messages.route.js";
 
 // Middleware
 dotenv.config();
@@ -81,54 +79,13 @@ mongoose
     process.exit(1);
   });
 
-// socketIo connections
-import { Server as SocketIo } from "socket.io";
-import http from "http";
-import Message from "./models/message.model.js";
-
-const server = http.createServer(app);
-const io = new SocketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log("A user connected : ", socket.id);
-
-  socket.on("connect", (userId) => {
-    console.log(`${userId} joined the room`);
-    socket.join(userId);
-  });
-
-  socket.on("sendMessage", async ({ senderId, receiverId, message }) => {
-    try {
-      const newMessage = await Message.create({
-        sender: senderId,
-        receiver: receiverId,
-        message,
-      });
-
-      io.to(receiverId).emit("recieveMessage", newMessage);
-    } catch (error) {
-      console.error("Error Saving Message", error);
-    }
-  });
-
-  socket.on("disconnect", (userId) => {
-    console.log(`${userId} disconnected`);
-  });
-});
 
 // API Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/complaints", complaintsRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api/support", supportRoutes);
 app.use("/api/sos", sosRoutes);
-app.use("/api/chat", messageRoutes);
 
 // 404 Error Handler
 app.use((req, res, next) => {

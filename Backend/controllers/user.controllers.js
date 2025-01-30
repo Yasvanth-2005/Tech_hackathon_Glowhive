@@ -109,7 +109,8 @@ export const userGoogleLogin = async (req, res) => {
 };
 
 export const userRegister = async (req, res) => {
-  const { username, password, phno, collegeId, email, primary_sos } = req.body;
+  const { username, password, phno, collegeId, email, primary_sos, userType } =
+    req.body;
 
   try {
     if (
@@ -118,7 +119,8 @@ export const userRegister = async (req, res) => {
       !phno ||
       !collegeId ||
       !email ||
-      !primary_sos
+      !primary_sos ||
+      !userType
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -148,7 +150,7 @@ export const userRegister = async (req, res) => {
     });
 
     const token = jwt.sign(
-      { userId: user._id, type: user.userType },
+      { userId: newUser._id, type: newUser.userType },
       process.env.JWT_SECRET
     );
 

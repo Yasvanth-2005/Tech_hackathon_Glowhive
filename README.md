@@ -47,7 +47,7 @@ Framework/Library: Flutter
 UI/UX Design: Figma or Adobe XD (for designing app layouts and user flows)
 State Management: Redux or Context API
 
-[Frontend Link](https://admin-glowhive.netlify.app/)
+[Frontend Link](https://girl-grievance.netlify.app/)
 
 ## Backend
 Server Framework: Node.js with Express.js (for handling APIs and business logic)
@@ -55,7 +55,7 @@ Database:
 MongoDB (NoSQL database for complaint and user data)
 Authentication:  JWT (JSON Web Token)
 
-[Backen Link](https://tech-hackathon-glowhive.onrender.com)]
+[Backen Link](https://tech-hackathon-glowhive.onrender.com)
 
 ## Postman Api link
 

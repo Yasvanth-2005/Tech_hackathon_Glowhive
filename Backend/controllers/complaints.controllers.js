@@ -119,7 +119,6 @@ export const getAllComplaints = async (req, res) => {
     },
   };
 
-  // Validate role for both sections
   const isRoleValid = Object.values(roleDaysMapping).some((mapping) =>
     Object.keys(mapping).includes(role)
   );
@@ -131,10 +130,8 @@ export const getAllComplaints = async (req, res) => {
   }
 
   try {
-    // Prepare the filter for complaints
-    let filters = [];
+    let filters = [{ isCritical: true }];
 
-    // Loop through each section and apply filters based on the role's mapping
     for (const [section, mapping] of Object.entries(roleDaysMapping)) {
       if (mapping[role] !== undefined) {
         const days = mapping[role];
@@ -143,15 +140,13 @@ export const getAllComplaints = async (req, res) => {
 
         filters.push({
           section,
-          $or: [{ isCritical: true }, { createdAt: { $gte: dateLimit } }],
+          createdAt: { $gte: dateLimit },
         });
       }
     }
 
-    // Combine all filters with `$or`
     const filter = { $or: filters };
 
-    // Fetch complaints based on the constructed filter
     const complaints = await Complaints.find(filter)
       .populate("userId", "email username phno collegeId")
       .sort({ createdAt: -1 });

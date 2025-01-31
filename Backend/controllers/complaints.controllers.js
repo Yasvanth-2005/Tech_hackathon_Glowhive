@@ -140,12 +140,15 @@ export const getAllComplaints = async (req, res) => {
 
         filters.push({
           section,
-          createdAt: { $gte: dateLimit },
+          createdAt: { $lte: new Date(dateLimit.toISOString()) },
         });
+
+        console.log(filters);
       }
     }
 
     const filter = { $or: filters };
+    console.log(filter);
 
     const complaints = await Complaints.find(filter)
       .populate("userId", "email username phno collegeId")

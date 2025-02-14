@@ -364,7 +364,7 @@ export const sendOtp = async (req, res) => {
         address: "sivahere9484@gmail.com",
       },
       to: email.split(",").map((email) => email.trim()),
-      subject: "Email Verfication of Girl Grievance",
+      subject: "Email Verfication of POSH-RGUKT",
       html: `
         <>
           <h1>${otp}</h1>

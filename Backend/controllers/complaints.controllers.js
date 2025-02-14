@@ -57,10 +57,10 @@ export const sendComplaint = async (req, res) => {
 
     const mailOptions = {
       from: {
-        name: "OTP Verification",
+        name: "Complaint Registered",
         address: "sivahere9484@gmail.com",
       },
-      to: user.email,
+      to: [user.email, "registrar@rgukt.in"],
       subject: "Complaint Acknowlegment of POSH",
       html: `
             <>

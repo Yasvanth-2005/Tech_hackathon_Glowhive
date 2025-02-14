@@ -57,6 +57,9 @@ const ComplaintDashboard = () => {
       complaint.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       complaint.userId?.username
         ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      complaint.acknowledgementId
+        ?.toLowerCase()
         .includes(searchQuery.toLowerCase())
   );
 

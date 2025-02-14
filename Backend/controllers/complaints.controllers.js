@@ -1,5 +1,6 @@
 import Complaints from "../models/complaints.model.js";
 import User from "../models/user.model.js";
+import nodemailer from "nodemailer";
 
 export const sendComplaint = async (req, res) => {
   const userId = req.user;
@@ -37,14 +38,38 @@ export const sendComplaint = async (req, res) => {
       return res.status(400).json({ message: "Posting Complaint Failed" });
     }
 
-    // Associate complaint with user
-    if (finalUserId) {
-      await User.findByIdAndUpdate(
-        finalUserId,
-        { $push: { complaints: complaint._id } },
-        { new: true }
-      );
-    }
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $push: { complaints: complaint._id } },
+      { new: true }
+    );
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: {
+        name: "OTP Verification",
+        address: "sivahere9484@gmail.com",
+      },
+      to: user.email,
+      subject: "Complaint Acknowlegment of POSH",
+      html: `
+            <>
+              <h1>Complaint Acknowlegment Id : ${acknowledgementId}</h1>
+            </>
+          `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
 
     return res.status(200).json({
       message: "New Complaint Sent Successfully",

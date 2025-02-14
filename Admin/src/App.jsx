@@ -95,15 +95,15 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/notifications/create" element={<CreateNotification />} />
+        {/* <Route path="/notifications" element={<Notifications />} />
+        <Route path="/notifications/create" element={<CreateNotification />} /> */}
         <Route path="/alerts" element={<Alert />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/criticals" element={<Criticals />} />
         <Route path="/admin/create" element={<CreateAdmin />} />
         <Route path="/complaint" element={<Complaint />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/support/add" element={<AddSupport />} />
+        {/* <Route path="/support" element={<Support />} />
+        <Route path="/support/add" element={<AddSupport />} /> */}
         <Route path="/sos" element={<SOS />} />
         <Route path="/users" element={<Users />} />
         <Route path="/sos/new" element={<AddSOS />} />

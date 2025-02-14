@@ -68,7 +68,6 @@ const Layout = ({ children }) => {
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
     { label: "Users", path: "users", icon: FaUsers },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },
-    { label: "Support", path: "support", icon: FaPersonBreastfeeding },
     { label: "SOS", path: "sos", icon: IoAlertCircle },
   ];
 

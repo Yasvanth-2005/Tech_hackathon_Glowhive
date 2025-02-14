@@ -9,6 +9,7 @@ const statusStyles = {
   Pending: "bg-yellow-100 text-yellow-800",
   Rejected: "bg-red-100 text-red-800",
   Solved: "bg-green-100 text-green-800",
+  New: "bg-green-100 text-green-800",
 };
 
 const ComplaintDashboard = () => {
@@ -211,17 +212,25 @@ const ComplaintDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <p className="font-semibold">
-                    Type:{" "}
-                    <span className="font-normal">
-                      {selectedComplaint.typeOfComplaint}
-                    </span>
-                  </p>
-                  <p className="font-semibold">
                     Category:{" "}
                     <span className="font-normal">
                       {selectedComplaint.category}
                     </span>
                   </p>
+                  <p className="font-semibold">
+                    Workplace:{" "}
+                    <span className="font-normal">
+                      {selectedComplaint.workplace}
+                    </span>
+                  </p>
+                  <p className="font-semibold">
+                    Section:{" "}
+                    <span className="font-normal">
+                      {selectedComplaint.section}
+                    </span>
+                  </p>
+                </div>
+                <div>
                   <p className="font-semibold">
                     Status:
                     <span
@@ -232,8 +241,6 @@ const ComplaintDashboard = () => {
                       {selectedComplaint.status}
                     </span>
                   </p>
-                </div>
-                <div>
                   <p className="font-semibold">
                     Critical:
                     <span
@@ -247,30 +254,12 @@ const ComplaintDashboard = () => {
                     </span>
                   </p>
                   <p className="font-semibold">
-                    Anonymous:
-                    <span
-                      className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                        selectedComplaint.isAnonymus
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {selectedComplaint.isAnonymus ? "Yes" : "No"}
-                    </span>
-                  </p>
-                  <p className="font-semibold">
-                    Date:{" "}
+                    Date & Time:{" "}
                     <span className="font-normal">
-                      {new Date(selectedComplaint.createdAt).toLocaleString()}
+                      {new Date(selectedComplaint.dateAndTime).toLocaleString()}
                     </span>
                   </p>
                 </div>
-              </div>
-              <div className="mb-4">
-                <p className="font-semibold">Statement:</p>
-                <p className="mt-1 text-gray-600">
-                  {selectedComplaint.statement}
-                </p>
               </div>
               <div className="mb-4">
                 <p className="font-semibold">Description:</p>
@@ -278,65 +267,34 @@ const ComplaintDashboard = () => {
                   {selectedComplaint.description}
                 </p>
               </div>
-              {selectedComplaint.location && (
+              {selectedComplaint.photo && (
                 <div className="mb-4">
-                  <p className="font-semibold">
-                    Location:{" "}
-                    <span className="font-normal">
-                      {selectedComplaint.location}
-                    </span>
-                  </p>
-                </div>
-              )}
-              {selectedComplaint.time && (
-                <div className="mb-4">
-                  <p className="font-semibold">
-                    Time:{" "}
-                    <span className="font-normal">
-                      {selectedComplaint.time}
-                    </span>
-                  </p>
+                  <p className="font-semibold">Photo Evidence:</p>
+                  <img
+                    src={selectedComplaint.photo}
+                    alt="Complaint Evidence"
+                    className="mt-2 max-w-full rounded-md"
+                  />
                 </div>
               )}
               <div className="mb-4">
                 <p className="font-semibold mb-2">Change Status:</p>
                 <div className="flex space-x-2">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(selectedComplaint._id, "Pending")
-                    }
-                    className={`px-4 py-2 rounded-md transition duration-300 ${
-                      selectedComplaint.status === "Pending"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
-                  >
-                    Pending
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleStatusChange(selectedComplaint._id, "Solved")
-                    }
-                    className={`px-4 py-2 rounded-md transition duration-300 ${
-                      selectedComplaint.status === "Solved"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
-                  >
-                    Solved
-                  </button>
-                  <button
-                    onClick={() =>
-                      handleStatusChange(selectedComplaint._id, "Rejected")
-                    }
-                    className={`px-4 py-2 rounded-md transition duration-300 ${
-                      selectedComplaint.status === "Rejected"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                    }`}
-                  >
-                    Rejected
-                  </button>
+                  {["New", "Pending", "Solved", "Rejected"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() =>
+                        handleStatusChange(selectedComplaint._id, status)
+                      }
+                      className={`px-4 py-2 rounded-md transition duration-300 ${
+                        selectedComplaint.status === status
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
                 </div>
               </div>
               <div className="flex justify-end mt-6">

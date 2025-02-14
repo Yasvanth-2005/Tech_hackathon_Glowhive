@@ -76,7 +76,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.role !== "DSW") {
+      if (user.admin.role !== "HOD") {
         navigate("/dashboard");
         toast.error("You are not authorized to view this page");
         return;

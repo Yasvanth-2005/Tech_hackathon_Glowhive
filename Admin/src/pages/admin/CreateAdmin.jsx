@@ -13,7 +13,7 @@ const CreateAdmin = () => {
     username: "",
     email: "",
     password: "",
-    role: "AO",
+    role: "ADSW",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

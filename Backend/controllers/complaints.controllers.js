@@ -64,8 +64,13 @@ export const sendComplaint = async (req, res) => {
       subject: "Complaint Acknowlegment of POSH",
       html: `
             <div>
-              <h2>Complaint Acknowledgment ID: ${acknowledgementId}</h2>
-              <pre>${JSON.stringify(complaint, null, 2)}</pre>
+              <h2>Complaint Registered</h2>
+              <h3>Complaint Acknowledgment ID: ${acknowledgementId}</h3>
+              <div>
+                <h4>WorkPlace : ${complaint.workplace}</h4>
+                <h4>Type of Complint : ${complaint.category}</h4>
+                <h4>Complaint Description : ${complaint.description}</h4>
+              </div>
             </div>
       `,
     };

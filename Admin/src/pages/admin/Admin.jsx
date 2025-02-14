@@ -11,7 +11,7 @@ const Admin = () => {
   const user = useSelector((state) => state.auth.user);
 
   const token = localStorage.getItem("authToken");
-  
+
   const [adminsData, setAdminsData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,11 +48,14 @@ const Admin = () => {
   const handleDelete = async (adminId) => {
     if (window.confirm("Are you sure you want to delete this admin?")) {
       try {
-        const response = await axios.delete(`${apiUrl}/admin/delete/${adminId}`, {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        });
+        const response = await axios.delete(
+          `${apiUrl}/admin/delete/${adminId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        );
 
         if (response.status === 200) {
           toast.success("Admin deleted successfully");
@@ -71,12 +74,24 @@ const Admin = () => {
       admin.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    if (user) {
+      if (user.role !== "DSW") {
+        navigate("/dashboard");
+        toast.error("You are not authorized to view this page");
+        return;
+      }
+    }
+  }, [user]);
+
   return (
     <Layout>
       <Toaster position="top-center" reverseOrder={false} />
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-800 mb-4 md:mb-0">Admin Management</h1>
+          <h1 className="text-3xl font-bold text-blue-800 mb-4 md:mb-0">
+            Admin Management
+          </h1>
           <button
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center"
             onClick={() => navigate("/admin/create")}
@@ -109,18 +124,29 @@ const Admin = () => {
               <table className="min-w-[97%] mx-auto divide-y divide-gray-200">
                 <thead className="bg-blue-600 text-white">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Username</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                      Username
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                      Role
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredAdmins.map((admin) => (
                     <tr key={admin._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">{admin.username}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{admin.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{admin.role}</td>
-                     
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {admin.username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {admin.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {admin.role}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -134,4 +160,3 @@ const Admin = () => {
 };
 
 export default Admin;
-

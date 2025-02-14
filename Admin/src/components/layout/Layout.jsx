@@ -64,11 +64,6 @@ const Layout = ({ children }) => {
 
   const sidebarItems = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
-    {
-      label: "Notifications",
-      path: "notifications",
-      icon: MdNotificationsActive,
-    },
     { label: "Alerts", path: "alerts", icon: RiAlertFill },
     { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
     { label: "Users", path: "users", icon: FaUsers },

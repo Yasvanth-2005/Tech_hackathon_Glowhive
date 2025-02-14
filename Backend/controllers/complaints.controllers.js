@@ -94,62 +94,78 @@ export const updateComplaint = async (req, res) => {
 };
 
 export const getAllComplaints = async (req, res) => {
-  const { role } = req;
-  console.log("User Role:", role);
-
-  const roleDaysMapping = {
-    Hostel: {
-      Warden: 0,
-      AO: 3,
-      DSW: 7,
-      VC: 10,
-    },
-    Academics: {
-      HOD: 0,
-      VC: 5,
-    },
-  };
-
-  const isRoleValid = Object.values(roleDaysMapping).some((mapping) =>
-    Object.keys(mapping).includes(role)
-  );
-
-  if (!isRoleValid) {
-    return res
-      .status(403)
-      .json({ message: "You are not allowed to see this data" });
-  }
-
   try {
+    const role = req.role;
+    if (!role) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    console.log("User Role:", role);
+
+    const roleDaysMapping = {
+      Hostel: {
+        "Chief Warden": 0,
+        DSW: 2,
+        "Dean Academics": 2,
+        "Administrator Officer": 4,
+        Director: 6,
+        ICC: 8,
+        Registrar: 10,
+        "Vice Chancellor": 12,
+      },
+      Academics: {
+        HOD: 0,
+        DSW: 2,
+        "Dean Academics": 2,
+        "Administrator Officer": 4,
+        Director: 6,
+        ICC: 8,
+        Registrar: 10,
+        "Vice Chancellor": 12,
+      },
+      Open_Premises: {
+        ADSW: 0,
+        DSW: 2,
+        "Dean Academics": 2,
+        "Administrator Officer": 4,
+        Director: 6,
+        ICC: 8,
+        Registrar: 10,
+        "Vice Chancellor": 12,
+      },
+    };
+
+    // Check if the role exists in any section
+    let roleFound = false;
     let filters = [{ isCritical: true }];
 
     for (const [section, mapping] of Object.entries(roleDaysMapping)) {
       if (mapping[role] !== undefined) {
+        roleFound = true;
+
         const days = mapping[role];
         const dateLimit = new Date();
         dateLimit.setDate(dateLimit.getDate() - days);
 
         filters.push({
           section,
-          createdAt: { $lte: new Date(dateLimit.toISOString()) },
+          createdAt: { $lte: dateLimit },
         });
-
-        console.log(filters);
       }
     }
 
+    if (!roleFound) {
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to see this data" });
+    }
+
     const filter = { $or: filters };
-    console.log(filter);
+    console.log("Applied Filter:", filter);
 
     const complaints = await Complaints.find(filter)
       .populate("userId", "email username phno collegeId")
       .sort({ createdAt: -1 });
-
-    if (!complaints.length) {
-      return res
-        .status(404)
-        .json({ message: "No complaints found for your role" });
-    }
 
     return res.status(200).json({
       message: "Complaints fetched successfully",

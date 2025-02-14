@@ -53,7 +53,6 @@ const App = () => {
         });
 
         if (response.status === 200 && response.data) {
-          console.log(response.data);
           dispatch(signInSuccess(response.data)); // Update user in Redux
         } else {
           console.error("Invalid response or no user data found.");

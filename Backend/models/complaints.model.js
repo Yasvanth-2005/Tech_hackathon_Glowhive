@@ -4,7 +4,7 @@ const ComplaintUserSchema = new mongoose.Schema(
   {
     section: {
       type: String,
-      enum: ["Academics", "Hostel"],
+      enum: ["Academics", "Hostel", "Open_Premises"],
       default: "Hostel",
     },
     workplace: {

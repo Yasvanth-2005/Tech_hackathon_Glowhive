@@ -4,6 +4,7 @@ import Layout from "../../components/layout/Layout";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import { MdDashboard, MdPeople, MdReport, MdCheckCircle } from "react-icons/md";
 import axios from "axios";
+import { ClipLoader } from "react-spinners";
 
 const StatCard = ({ title, count, icon: Icon, bgColor, loading }) => (
   <div
@@ -29,7 +30,7 @@ const StatCard = ({ title, count, icon: Icon, bgColor, loading }) => (
 const Dashboard = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem("authToken");
-  const user = useSelector((state) => state.auth.user.admin);
+  const user = useSelector((state) => state.auth.user?.admin);
   const [searchTerm, setSearchTerm] = useState("");
   const [complaints, setComplaints] = useState([]);
 
@@ -52,11 +53,11 @@ const Dashboard = () => {
           (complaint) => complaint.isCritical
         );
 
-        const total = criticalComplaints.length;
-        const pending = criticalComplaints.filter(
+        const total = fetchedComplaints.length;
+        const pending = fetchedComplaints.filter(
           (complaint) => complaint.status.toLowerCase() === "pending"
         ).length;
-        const solved = criticalComplaints.filter(
+        const solved = fetchedComplaints.filter(
           (complaint) => complaint.status.toLowerCase() === "solved"
         ).length;
 
@@ -86,6 +87,14 @@ const Dashboard = () => {
   const filteredData = complaints.filter((item) =>
     item.statement.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (!user) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <ClipLoader size={50} color="#3498db" />
+      </div>
+    );
+  }
 
   return (
     <Layout>

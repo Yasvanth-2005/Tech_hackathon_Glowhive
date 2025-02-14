@@ -6,8 +6,8 @@ import Layout from "../../components/layout/Layout";
 import { useSelector } from "react-redux";
 
 const CreateAdmin = () => {
-  const user = useSelector((state) => state.auth.user)
-  
+  const user = useSelector((state) => state.auth.user);
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -20,7 +20,7 @@ const CreateAdmin = () => {
   const [error, setError] = useState("");
   const token = localStorage.getItem("authToken");
 
-  const apiUrl = import.meta.env.VITE_API_URL; 
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -32,41 +32,37 @@ const CreateAdmin = () => {
   };
 
   // Handle form submission
-// Handle form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  try {
-    const response = await axios.post(
-      `${apiUrl}/admin/register`,
-      formData,
-      {
+    try {
+      const response = await axios.post(`${apiUrl}/admin/register`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      });
+
+      if (response.status === 201) {
+        toast.success("Admin created successfully!");
+        navigate("/dashboard");
+      } else {
+        const message = response.data?.message || "Registration failed.";
+        setError(message);
+        toast.error(message);
       }
-    );
-
-    if (response.status === 201) {
-      toast.success("Admin created successfully!");
-      navigate("/dashboard");
-    } else {
-      const message = response.data?.message || "Registration failed.";
-      setError(message);
-      toast.error(message);
+    } catch (err) {
+      console.error("Registration error:", err);
+      const errorMessage =
+        err.response?.data?.message || "Something went wrong!";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Registration error:", err);
-    const errorMessage = err.response?.data?.message || "Something went wrong!";
-    setError(errorMessage);
-    toast.error(errorMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <Layout>
@@ -137,10 +133,16 @@ const handleSubmit = async (e) => {
             required
             className="border border-gray-500 rounded-md p-2"
           >
-            <option value="AO">AO</option>
+            <option value="ADSW">ADSW</option>
+            <option value="Chief Warden">Chief Warden</option>
+            <option value="Administrator Officer">Administrator Officer</option>
             <option value="DSW">DSW</option>
             <option value="HOD">HOD</option>
-            <option value="Warden">Warden</option>
+            <option value="Director">Director</option>
+            <option value="Registrar">Registrar</option>
+            <option value="ICC">ICC</option>
+            <option value="Vice Chancellor">Vice Chancellor</option>
+            <option value="Dean Academics">Dean Academics</option>
           </select>
 
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}

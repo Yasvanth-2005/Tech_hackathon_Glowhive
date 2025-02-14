@@ -32,8 +32,8 @@ const Login = () => {
 
       if (response.status === 200) {
         toast.success("Login successful!");
-        const { token } = response.data; // Assuming the token is in the response
-        localStorage.setItem("authToken", token); // Save the token to localStorage
+        const { token } = response.data;
+        localStorage.setItem("authToken", token);
         navigate("/dashboard");
       } else {
         const message = response.data?.message || "Login failed.";
@@ -57,9 +57,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center">
       <Toaster position="top-center" reverseOrder={false} />
       <div className="w-[93%] max-w-md p-8 space-y-6 bg-white rounded-lg border border-black shadow-lg">
-        <h2 className="text-center text-3xl font-bold text-blue-600">
-          Login
-        </h2>
+        <h2 className="text-center text-3xl font-bold text-blue-600">Login</h2>
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {/* Email Field */}
           <div>

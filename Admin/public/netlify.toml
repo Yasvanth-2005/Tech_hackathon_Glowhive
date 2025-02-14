@@ -1,0 +1,34 @@
+[[redirects]]
+  from = "/dashboard"
+  to = "/index.html?redirect=dashboard"
+  status = 200
+
+[[redirects]]
+  from = "/alerts"
+  to = "/index.html?redirect=alerts"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/index.html?redirect=admin"
+  status = 200
+
+[[redirects]]
+  from = "/users"
+  to = "/index.html?redirect=users"
+  status = 200
+
+[[redirects]]
+  from = "/complaint"
+  to = "/index.html?redirect=complaint"
+  status = 200
+
+[[redirects]]
+  from = "/support"
+  to = "/index.html?redirect=support"
+  status = 200
+
+[[redirects]]
+  from = "/sos"
+  to = "/index.html?redirect=sos"
+  status = 200

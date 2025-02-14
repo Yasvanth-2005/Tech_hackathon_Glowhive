@@ -11,8 +11,19 @@ const adminModel = new mongoose.Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ["Warden", "AO", "DSW", "HOD", "VC"],
-    default: "Warden",
+    enum: [
+      "ADSW",
+      "Chief Warden",
+      "Administrator Officer",
+      "DSW",
+      "HOD",
+      "Director",
+      "Registrar",
+      "ICC",
+      "Vice Chancellor",
+      "Dean Academics",
+    ],
+    default: "Chief Warden",
   },
 });
 

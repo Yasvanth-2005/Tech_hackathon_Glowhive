@@ -63,10 +63,11 @@ export const sendComplaint = async (req, res) => {
       to: [user.email, "registrar@rgukt.in"],
       subject: "Complaint Acknowlegment of POSH",
       html: `
-            <>
-              <h1>Complaint Acknowlegment Id : ${acknowledgementId}</h1>
-            </>
-          `,
+            <div>
+              <h2>Complaint Acknowledgment ID: ${acknowledgementId}</h2>
+              <pre>${JSON.stringify(complaint, null, 2)}</pre>
+            </div>
+      `,
     };
 
     const info = await transporter.sendMail(mailOptions);

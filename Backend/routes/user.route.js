@@ -40,10 +40,10 @@ router.post("/recover/password", postForgotPassword);
 router.post("/verify/password", verifyForgotPassword);
 router.post("/reset/password", resPassword);
 
-router.patch("/edit/username", verifyUserToken, updateUsername);
-router.patch("/edit/primary", verifyUserToken, updatePrimarySOS);
-
 router.post("/send/otp", sendOtp);
 router.post("/verify/otp", verifyOtp);
+
+router.patch("/edit/username", verifyUserToken, updateUsername);
+router.patch("/edit/primary", verifyUserToken, updatePrimarySOS);
 
 export default router;

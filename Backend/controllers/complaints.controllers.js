@@ -2,52 +2,49 @@ import Complaints from "../models/complaints.model.js";
 import User from "../models/user.model.js";
 
 export const sendComplaint = async (req, res) => {
-  const {
-    typeOfComplaint,
-    statement,
-    description,
-    category,
-    userId,
-    isCritical,
-    location,
-    time,
-    victinDetails,
-    harasserDetails,
-    harasserType,
-    img,
-    video,
-    section,
-  } = req.body;
-
-  const finalUserId = userId?.trim() ? userId : null;
-
+  const userId = req.user;
   try {
-    const complaint = await Complaints.create({
-      typeOfComplaint,
-      statement,
-      description,
-      category,
-      userId: finalUserId,
-      img,
-      video,
-      isCritical,
-      location,
-      time,
-      victinDetails,
-      harasserDetails,
-      harasserType,
+    const {
       section,
+      workplace,
+      category,
+      description,
+      dateAndTime,
+      photo,
+      isCritical,
+    } = req.body;
+
+    // Generate unique Acknowledgement ID
+    const acknowledgementId = `RGUKT-${Math.floor(
+      10000 + Math.random() * 90000
+    )}`;
+
+    // Create complaint
+    const complaint = await Complaints.create({
+      section,
+      workplace,
+      category,
+      description,
+      dateAndTime,
+      photo,
+      isCritical,
+      status: "New",
+      acknowledgementId,
+      userId,
     });
 
     if (!complaint) {
-      return res.status(404).json({ message: "Posting Complaint Failed" });
+      return res.status(400).json({ message: "Posting Complaint Failed" });
     }
 
-    await User.findByIdAndUpdate(
-      req.user,
-      { $push: { complaints: complaint._id } },
-      { new: true }
-    );
+    // Associate complaint with user
+    if (finalUserId) {
+      await User.findByIdAndUpdate(
+        finalUserId,
+        { $push: { complaints: complaint._id } },
+        { new: true }
+      );
+    }
 
     return res.status(200).json({
       message: "New Complaint Sent Successfully",
@@ -69,7 +66,7 @@ export const updateComplaint = async (req, res) => {
   const { status } = req.body;
 
   try {
-    const validStatuses = ["Pending", "Rejected", "Solved"];
+    const validStatuses = ["New", "Pending", "Rejected", "Solved"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Invalid Status" });
     }
@@ -78,12 +75,6 @@ export const updateComplaint = async (req, res) => {
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }
-
-    // if (complaint.status === "Solved") {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Complaint is already solved. Cannot update." });
-    // }
 
     complaint.status = status;
     await complaint.save();
@@ -174,10 +165,9 @@ export const getComplaintDetails = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const complaint = await Complaints.findById(id).populate(
-      "userId",
-      "email username phno collegeId"
-    );
+    const complaint = await Complaints.findOne({
+      acknowledgementId: id,
+    }).populate("userId", "email username phno collegeId");
     if (!complaint) {
       return res.status(404).json({ message: "Message not found" });
     }

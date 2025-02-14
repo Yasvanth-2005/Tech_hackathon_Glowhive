@@ -2,38 +2,47 @@ import mongoose from "mongoose";
 
 const ComplaintUserSchema = new mongoose.Schema(
   {
-    typeOfComplaint: {
+    section: {
       type: String,
-      enum: ["Personal", "General", "Harassment"],
-      default: "Personal",
+      enum: ["Academics", "Hostel"],
+      default: "Hostel",
     },
-    statement: {
+    workplace: {
       type: String,
+      required: [true, "Workplace is required."],
+    },
+    category: {
+      type: String,
+      required: [true, "Category is required."],
     },
     description: {
       type: String,
+      required: [true, "Description is required."],
     },
-    victinDetails: { type: String },
-    harasserDetails: { type: String },
-    harasserType: { type: String },
-    category: { type: String },
-    userId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-      default: null,
+    dateAndTime: {
+      type: String,
+    },
+    photo: {
+      type: String,
+    },
+    isCritical: {
+      type: Boolean,
+      default: false,
     },
     status: {
       type: String,
-      enum: ["Pending", "Rejected", "Solved"],
-      default: "Pending",
+      enum: ["New", "Pending", "Solved", "Rejected"],
+      default: "New",
     },
-    img: { type: String },
-    video: { type: String },
-    isCritical: { type: Boolean, default: false },
-    isAnonymus: { type: Boolean, default: false },
-    location: { type: String },
-    time: { type: String },
-    section:{type:String,enum:["Academics","Hostel"],default:"Hostel"}
+    acknowledgementId: {
+      type: String,
+      required: [true, "Acknowledgement ID is required."],
+    },
+    userId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+      required: [true, "User ID is required."],
+    },
   },
   {
     timestamps: true,

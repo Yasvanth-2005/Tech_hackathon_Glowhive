@@ -330,11 +330,6 @@ export const updatePrimarySOS = async (req, res) => {
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
 
-  const rguktnEmailRegex = /^[NnRrOoSs]\d{6}@rguktn\.ac\.in$/;
-  if (!email || !rguktnEmailRegex.test(email)) {
-    return res.status(400).json({ message: "RGUKTN Email is required" });
-  }
-
   try {
     const emailExists = await User.findOne({ email: email.toLowerCase() });
     if (emailExists) {
@@ -414,11 +409,6 @@ export const verifyOtp = async (req, res) => {
 
 export const postForgotPassword = async (req, res) => {
   const { email } = req.body;
-
-  const rguktnEmailRegex = /^[NnRrOoSs]\d{6}@rguktn\.ac\.in$/;
-  if (!email || !rguktnEmailRegex.test(email)) {
-    return res.status(400).json({ message: "RGUKTN Email is required" });
-  }
 
   try {
     const emailExists = await User.findOne({ email: email.toLowerCase() });

@@ -25,6 +25,7 @@ const authSlice = createSlice({
     },
     signOut: (state) => {
       state.user = null; // No need to manually remove from localStorage
+      localStorage.clear(); // Clear all stored session data
     },
   },
 });

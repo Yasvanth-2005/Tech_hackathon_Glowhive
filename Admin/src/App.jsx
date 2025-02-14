@@ -102,6 +102,7 @@ const App = () => {
         <Route path="/criticals" element={<Criticals />} />
         <Route path="/admin/create" element={<CreateAdmin />} />
         <Route path="/complaint" element={<Complaint />} />
+        <Route path="/complaint/:searchQuery?" element={<Complaint/>} />
         {/* <Route path="/support" element={<Support />} />
         <Route path="/support/add" element={<AddSupport />} /> */}
         <Route path="/sos" element={<SOS />} />

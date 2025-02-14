@@ -121,7 +121,7 @@ const Layout = ({ children }) => {
               className="flex text-2xl items-center gap-2 font-bold text-blue-600"
             >
               <img src={logo} className="w-[50px] h-[50px]" />
-              <span class="font text-base pt-2">POSH</span>
+              <span className="font text-base pt-2">POSH</span>
             </Link>
           </div>
           <nav className="flex-1 overflow-y-auto p-4 space-y-2">

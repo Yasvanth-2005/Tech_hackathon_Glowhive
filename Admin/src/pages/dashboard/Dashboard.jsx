@@ -84,8 +84,13 @@ const Dashboard = () => {
     });
   };
 
-  const filteredData = complaints.filter((item) =>
-    item.statement.toLowerCase().includes(searchTerm.toLowerCase())
+  // const filteredData = complaints.filter((item) =>
+  //   item.statement.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
+
+  const filteredData = complaints.filter(
+    (item) =>
+      item?.statement?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (!user) {

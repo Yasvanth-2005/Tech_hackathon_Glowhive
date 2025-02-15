@@ -45,5 +45,6 @@ router.post("/verify/otp", verifyOtp);
 
 router.patch("/edit/username", verifyUserToken, updateUsername);
 router.patch("/edit/primary", verifyUserToken, updatePrimarySOS);
+router.patch("/edit/profilImg", verifyUserToken, updateProfile);
 
 export default router;

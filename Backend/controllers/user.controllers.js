@@ -332,10 +332,6 @@ export const updateProfileImg = async (req, res) => {
   const { profileImg } = req.body;
 
   try {
-    if (!profileImg) {
-      return res.status(400).json({ message: "Image is required" });
-    }
-
     const editUser = await User.findByIdAndUpdate(user, { profileImg });
     if (!editUser) {
       return res.status(400).json({ message: "Error Upadating Profile Image" });

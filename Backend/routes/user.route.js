@@ -18,6 +18,7 @@ import {
   verifyForgotPassword,
   resPassword,
   userGoogleLogin,
+  updateProfileImg,
 } from "../controllers/user.controllers.js";
 import { verifyUserToken } from "../middleware/userTokenCheck.js";
 import adminTokenCheck from "../middleware/adminTokenCheck.js";
@@ -45,5 +46,6 @@ router.post("/verify/otp", verifyOtp);
 
 router.patch("/edit/username", verifyUserToken, updateUsername);
 router.patch("/edit/primary", verifyUserToken, updatePrimarySOS);
+router.patch("/edit/profilImg", verifyUserToken, updateProfileImg);
 
 export default router;

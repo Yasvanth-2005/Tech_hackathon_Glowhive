@@ -322,6 +322,24 @@ export const updatePrimarySOS = async (req, res) => {
   }
 };
 
+export const updateProfileImg = async (req, res) => {
+  const user = req.user;
+  const { profileImg } = req.body;
+
+  try {
+    const editUser = await User.findByIdAndUpdate(user, { profileImg });
+    if (!editUser) {
+      return res.status(400).json({ message: "Error Upadating Profile Image" });
+    }
+
+    return res.status(200).json({ message: "Profile Image Updated Successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
 

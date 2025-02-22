@@ -60,7 +60,7 @@ export const sendComplaint = async (req, res) => {
         name: "Complaint Registered",
         address: "sivahere9484@gmail.com",
       },
-      to: [user.email, "registrar@rgukt.in"],
+      to: user.email,
       subject: "Complaint Acknowlegment of POSH",
       html: `
             <div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import toast from "react-hot-toast";
 
@@ -13,6 +14,8 @@ const statusStyles = {
 };
 
 const ComplaintDashboard = () => {
+  const { searchQuery: paramQuery } = useParams();
+  const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +46,19 @@ const ComplaintDashboard = () => {
   useEffect(() => {
     fetchComplaints();
   }, []);
+
+  useEffect(() => {
+    // Sync input field with URL query
+    if (paramQuery !== searchQuery) {
+      setSearchQuery(paramQuery || "");
+    }
+  }, [paramQuery]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    navigate(`/complaint/${value}`); // Update URL on search
+  };
 
   const filteredComplaints = complaints.filter(
     (complaint) =>
@@ -101,7 +117,7 @@ const ComplaintDashboard = () => {
                 type="text"
                 placeholder="Search complaints..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
@@ -165,7 +181,7 @@ const ComplaintDashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {complaint.isCritical && (
+                          {complaint.isCritical ? (
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                               Critical
                             </span>
@@ -233,7 +249,7 @@ const ComplaintDashboard = () => {
                     </span>
                   </p>
                 </div>
-                <div>
+                <div className="flex flex-col gap-2">
                   <p className="font-semibold">
                     Status:
                     <span

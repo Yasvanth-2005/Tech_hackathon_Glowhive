@@ -84,9 +84,14 @@ const Dashboard = () => {
     });
   };
 
-  const filteredData = complaints.filter((item) =>
-    item.statement.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = complaints.filter((item) => {
+    {
+      return (
+        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.acknowledgementId.toLowercase().includes(searchTerm.toLowerCase())
+      );
+    }
+  });
 
   if (!user) {
     return (
@@ -210,8 +215,8 @@ const Dashboard = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredData.map((item) => (
                     <tr key={item._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {item.statement}
+                      <td className="px-6 py-4 text-sm line-clamp-3 text-gray-700">
+                        {item.description}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700">
                         {item.category}

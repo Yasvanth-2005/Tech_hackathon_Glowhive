@@ -129,10 +129,7 @@ const ComplaintDashboard = () => {
                 <thead className="bg-blue-600">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                      Category
+                      Description
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                       Date
@@ -151,17 +148,14 @@ const ComplaintDashboard = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredComplaints.length > 0 ? (
                     filteredComplaints.map((complaint) => (
-                      <tr key={complaint._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {complaint.typeOfComplaint}
+                      <tr key={complaint._id} className="overflow-hidden">
+                        <td className="ml-6 my-4 max-w-[320px] line-clamp-3 max-h-[120px] overflow-hidden">
+                          {complaint.description}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {complaint.category}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4">
                           {new Date(complaint.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                               statusStyles[complaint.status]
@@ -207,8 +201,14 @@ const ComplaintDashboard = () => {
         </div>
 
         {isModalOpen && selectedComplaint && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+          <div
+            onClick={() => setIsModalOpen(false)}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white max-h-[70vh] overflow-y-auto rounded-lg p-6 w-full max-w-2xl"
+            >
               <h2 className="text-2xl font-bold text-blue-800 mb-4">
                 Complaint Details
               </h2>
@@ -256,12 +256,16 @@ const ComplaintDashboard = () => {
                       {selectedComplaint.isCritical ? "Yes" : "No"}
                     </span>
                   </p>
-                  <p className="font-semibold">
-                    Date & Time:{" "}
-                    <span className="font-normal">
-                      {new Date(selectedComplaint.dateAndTime).toLocaleString()}
-                    </span>
-                  </p>
+                  {selectedComplaint.dateAndTime && (
+                    <p className="font-semibold">
+                      Date & Time:{" "}
+                      <span className="font-normal">
+                        {new Date(
+                          selectedComplaint.dateAndTime
+                        ).toLocaleString()}
+                      </span>
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="mb-4">
@@ -276,7 +280,7 @@ const ComplaintDashboard = () => {
                   <img
                     src={selectedComplaint.photo}
                     alt="Complaint Evidence"
-                    className="mt-2 max-w-full rounded-md"
+                    className="mt-2 max-w-full rounded-md w-24 h-24"
                   />
                 </div>
               )}

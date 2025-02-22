@@ -125,11 +125,6 @@ export const userRegister = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const emailRegex = /.+@.+\..+/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res

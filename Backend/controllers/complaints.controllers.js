@@ -123,8 +123,23 @@ export const updateComplaint = async (req, res) => {
       return res.status(404).json({ message: "Complaint not found" });
     }
 
+    // Prevent reverting to "New" status if it's already updated
+    if (status === "New" && complaint.status !== "New") {
+      return res
+        .status(400)
+        .json({ message: "Cannot revert status to 'New'." });
+    }
+
+
     complaint.status = status;
     await complaint.save();
+
+    // Send an email notification to the user
+    await sendEmail({
+      to:User.email, // Ensure complaint document has 'userEmail'
+      subject: "Complaint Status Updated",
+      text: `Your complaint with ID ${complaint._id} has been updated to: ${status}.`,
+    });
 
     return res
       .status(200)

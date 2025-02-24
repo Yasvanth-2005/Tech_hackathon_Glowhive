@@ -332,13 +332,14 @@ export const updateProfileImg = async (req, res) => {
       return res.status(400).json({ message: "Error Upadating Profile Image" });
     }
 
-    return res.status(200).json({ message: "Profile Image Updated Successfully" });
+    return res
+      .status(200)
+      .json({ message: "Profile Image Updated Successfully" });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -379,9 +380,29 @@ export const sendOtp = async (req, res) => {
       to: email.split(",").map((email) => email.trim()),
       subject: "Email Verfication of POSH-RGUKT",
       html: `
-        <>
-          <h1>${otp}</h1>
-        </>
+        
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+  <h2 style="font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 16px;">
+    <span style="color: #1E3A8A;">POSH</span> OTP Verification
+  </h2>
+
+  <p style="font-size: 14px; color: #4A4A4A; text-align: center; margin-bottom: 20px;">
+    Enter the following code in the POSH mobile app to verify your account and start your actions:
+  </p>
+
+  <div style="background-color: rgba(30, 58, 138, 0.15); color: #1A1A1A; font-size: 24px; font-family: monospace; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+  ${otp}
+  </div>
+
+  <p style="font-size: 12px; color: #4B5563; text-align: center; margin-bottom: 16px;">
+    This OTP will expire in 10 minutes.
+  </p>
+
+  <p style="font-size: 12px; color: #6B7280; text-align: center; margin-top: 20px;">
+    Didn't request this? Ignore this notification.
+  </p>
+</div>
+
       `,
     };
 
@@ -749,26 +770,45 @@ export const postSOS = async (req, res) => {
         to: recipient.email,
         subject: "🚨 SOS Notification 🚨",
         html: `
-          <h1 style="text-align:center">From <span style="color:purple;">Girl Grievances</span>.</h1>
-          <h4 style="text-align:center">Emergency Alert: Immediate Assistance Required</h4>
-          <h5 style="text-align:center">Dear ${recipient.name},</h5>
-          <p style="text-align:center">The app recognizes that one of your users is in a threat situation.</p>
-          <pre style="text-align:center">
-            Name of User: ${userResponse.username}
-            Contact Information: +91 ${userResponse.phno}
-            Location Coordinates: [${lat}, ${long}]
-            <a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a>
-            ${
-              audioLink
-                ? `<a href="${audioLink}" target="_blank">${audioLink}</a>`
-                : "Audio: Not provided"
-            }
-            ${
-              videoLink
-                ? `<a href="${videoLink}" target="_blank">Watch Video</a>`
-                : "Video: Not provided"
-            }
-          </pre>
+          <h1 style="text-align: center;">From <span style="color: purple;">Girl Grievances</span></h1>
+
+<h4 style="text-align: center;">Emergency Alert: Immediate Assistance Required</h4>
+
+<h5 style="text-align: center;">Dear ${recipient.name},</h5>
+
+<p style="text-align: center;">This is an automated alert indicating that a user is currently in a potential threat situation and requires immediate assistance.</p>
+
+<div style="text-align: center;">
+  <p><strong>User Information:</strong></p>
+  <p>Name: ${userResponse.username}</p>
+  <p>Contact: +91 ${userResponse.phno}</p>
+
+  <p><strong>Location Details:</strong></p>
+  <p>Coordinates: [${lat}, ${long}]</p>
+  <p><a href="${googleMapsLink}" target="_blank">View Location on Google Maps</a></p>
+
+  <p><strong>Media Evidence:</strong></p>
+  <p>
+    ${
+      audioLink
+        ? `<a href="${audioLink}" target="_blank">Listen to Audio Recording</a>`
+        : "Audio: Not provided"
+    }
+  </p>
+  <p>
+    ${
+      videoLink
+        ? `<a href="${videoLink}" target="_blank">Watch Video Recording</a>`
+        : "Video: Not provided"
+    }
+  </p>
+</div>
+
+<p style="text-align: center;">Please prioritize this alert and take immediate action as necessary.</p>
+
+<p style="text-align: center;">Thank you for your prompt attention to this matter.</p>
+
+<p style="text-align: center;"><em>Girl Grievances Support Team</em></p>
         `,
       })
     );

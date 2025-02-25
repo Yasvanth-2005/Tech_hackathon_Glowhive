@@ -46,6 +46,9 @@ const ComplaintUserSchema = new mongoose.Schema(
     admin_description: {
       type: String,
     },
+    admin_role: {
+      type: String,
+    },
   },
   {
     timestamps: true,

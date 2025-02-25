@@ -110,6 +110,7 @@ export const sendComplaint = async (req, res) => {
 
 export const updateComplaint = async (req, res) => {
   const { id } = req.params;
+  const role = req.role;
   const { status, admin_description } = req.body;
 
   try {
@@ -123,6 +124,7 @@ export const updateComplaint = async (req, res) => {
       {
         admin_description,
         status,
+        admin_role: role,
       },
       {
         new: true,

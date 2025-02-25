@@ -113,7 +113,7 @@ export const updateComplaint = async (req, res) => {
   const { status, admin_description } = req.body;
 
   try {
-    const validStatuses = ["New", "Pending", "Rejected", "Solved"];
+    const validStatuses = ["Pending", "Rejected", "Solved"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Invalid Status" });
     }
@@ -130,13 +130,6 @@ export const updateComplaint = async (req, res) => {
     ).populate("userId");
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
-    }
-
-    // Prevent reverting to "New" status if it's already updated
-    if (status === "New" && complaint.status !== "New") {
-      return res
-        .status(400)
-        .json({ message: "Cannot revert status to 'New'." });
     }
 
     const transporter = nodemailer.createTransport({

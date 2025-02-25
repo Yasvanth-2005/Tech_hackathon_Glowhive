@@ -157,7 +157,7 @@ export const updateComplaint = async (req, res) => {
               <h2>Complaint Registered</h2>
               <h3>Complaint Acknowledgment ID: ${complaint.acknowledgementId}</h3>
               <div>
-                <h4>Complaint Status  Description : ${complaint.admin_role} ->  ${complaint.admin_description}</h4>
+                <h4>Complaint Status  Description : ${complaint.admin_role} : ${complaint.admin_description}</h4>
               </div>
             </div>
       `,

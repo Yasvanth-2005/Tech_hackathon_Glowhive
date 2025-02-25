@@ -169,10 +169,10 @@ const ComplaintDashboard = () => {
                 <thead className="bg-blue-600">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                      Description
+                      Acknowledgement Id
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                      Date
+                      Description
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                       Status
@@ -189,11 +189,11 @@ const ComplaintDashboard = () => {
                   {filteredComplaints.length > 0 ? (
                     filteredComplaints.map((complaint) => (
                       <tr key={complaint._id} className="overflow-hidden">
+                        <td className="px-6 py-4">
+                          {complaint.acknowledgementId}
+                        </td>
                         <td className="px-6 my-4 max-w-[320px] line-clamp-3 max-h-[120px] overflow-hidden">
                           {complaint.description}
-                        </td>
-                        <td className="px-6 py-4">
-                          {new Date(complaint.createdAt).toLocaleString()}
                         </td>
                         <td className="px-6 py-4">
                           <span
@@ -265,6 +265,12 @@ const ComplaintDashboard = () => {
                       Acknowledgement Id:{" "}
                       <span className="font-normal">
                         {selectedComplaint.acknowledgementId}
+                      </span>
+                    </p>
+                    <p className="font-semibold">
+                      College Id:{" "}
+                      <span className="font-normal">
+                        {selectedComplaint.userId.collegeId}
                       </span>
                     </p>
                     <p className="font-semibold">

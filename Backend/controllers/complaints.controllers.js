@@ -63,15 +63,31 @@ export const sendComplaint = async (req, res) => {
       to: user.email,
       subject: "Complaint Acknowlegment of POSH",
       html: `
-            <div>
-              <h2>Complaint Registered</h2>
-              <h3>Complaint Acknowledgment ID: ${acknowledgementId}</h3>
-              <div>
-                <h4>WorkPlace : ${complaint.workplace}</h4>
-                <h4>Type of Complint : ${complaint.category}</h4>
-                <h4>Complaint Description : ${complaint.description}</h4>
-              </div>
-            </div>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+  <h2 style="font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 16px;">
+    <span style="color: #1E3A8A;">POSH</span> Complaint Acknowledgement
+  </h2>
+
+  <p style="font-size: 14px; color: #4A4A4A; text-align: center; margin-bottom: 20px;">
+    Thank you for submitting your complaint. Your Acknowledgement ID is shown below. Use this ID to track the status of your complaint.
+  </p>
+
+  <div style="background-color: rgba(30, 58, 138, 0.15); color: #1A1A1A; font-size: 24px; font-family: monospace; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+    ${acknowledgementId}
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <h4 style="font-size: 16px; margin: 8px 0;">WorkPlace: ${complaint.workplace}</h4>
+    <h4 style="font-size: 16px; margin: 8px 0;">Type of Complaint: ${complaint.category}</h4>
+    <h4 style="font-size: 16px; margin: 8px 0;">Complaint Description: ${complaint.description}</h4>
+  </div>
+
+  <p style="font-size: 12px; color: #6B7280; text-align: center; margin-top: 20px;">
+    If you did not submit this complaint, please contact support immediately.
+  </p>
+</div>
+
+
       `,
     };
 
@@ -114,6 +130,13 @@ export const updateComplaint = async (req, res) => {
     ).populate("userId");
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
+    }
+
+    // Prevent reverting to "New" status if it's already updated
+    if (status === "New" && complaint.status !== "New") {
+      return res
+        .status(400)
+        .json({ message: "Cannot revert status to 'New'." });
     }
 
     const transporter = nodemailer.createTransport({

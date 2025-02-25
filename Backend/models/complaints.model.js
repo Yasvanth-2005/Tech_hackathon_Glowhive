@@ -43,6 +43,9 @@ const ComplaintUserSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User ID is required."],
     },
+    admin_description: {
+      type: String,
+    },
   },
   {
     timestamps: true,

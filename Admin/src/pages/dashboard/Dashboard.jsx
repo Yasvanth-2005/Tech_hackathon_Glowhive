@@ -113,7 +113,7 @@ const Dashboard = () => {
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <StatCard
-            title="Total Critical Complaints"
+            title="Total Complaints"
             count={stats.total}
             icon={MdReport}
             bgColor="bg-red-500"
@@ -164,7 +164,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="bg-white shadow-md rounded-lg p-6 mb-12">
+        {/* <section className="bg-white shadow-md rounded-lg p-6 mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">
               Critical Complaints
@@ -236,7 +236,7 @@ const Dashboard = () => {
               </table>
             )}
           </div>
-        </section>
+        </section> */}
       </div>
     </Layout>
   );

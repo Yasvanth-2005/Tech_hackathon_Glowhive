@@ -165,7 +165,7 @@ const ComplaintDashboard = () => {
                   {filteredComplaints.length > 0 ? (
                     filteredComplaints.map((complaint) => (
                       <tr key={complaint._id} className="overflow-hidden">
-                        <td className="ml-6 my-4 max-w-[320px] line-clamp-3 max-h-[120px] overflow-hidden">
+                        <td className="px-6 my-4 max-w-[320px] line-clamp-3 max-h-[120px] overflow-hidden">
                           {complaint.description}
                         </td>
                         <td className="px-6 py-4">
@@ -181,7 +181,7 @@ const ComplaintDashboard = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {complaint.isCritical ? (
+                          {complaint.isCritical && (
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                               Critical
                             </span>

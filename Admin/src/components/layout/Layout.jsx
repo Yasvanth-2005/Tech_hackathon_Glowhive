@@ -65,7 +65,9 @@ const Layout = ({ children }) => {
   const sidebarItems = [
     { label: "Dashboard", path: "dashboard", icon: MdSpaceDashboard },
     { label: "Alerts", path: "alerts", icon: RiAlertFill },
-    { label: "Admins", path: "admin", icon: MdAdminPanelSettings },
+    ...(user && user.role === "HOD"
+      ? [{ label: "Admins", path: "admin", icon: MdAdminPanelSettings }]
+      : []),
     { label: "Users", path: "users", icon: FaUsers },
     { label: "Complaints", path: "complaint", icon: LuNotebookPen },
     { label: "SOS", path: "sos", icon: IoAlertCircle },

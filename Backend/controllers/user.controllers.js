@@ -332,13 +332,14 @@ export const updateProfileImg = async (req, res) => {
       return res.status(400).json({ message: "Error Upadating Profile Image" });
     }
 
-    return res.status(200).json({ message: "Profile Image Updated Successfully" });
+    return res
+      .status(200)
+      .json({ message: "Profile Image Updated Successfully" });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -379,9 +380,45 @@ export const sendOtp = async (req, res) => {
       to: email.split(",").map((email) => email.trim()),
       subject: "Email Verfication of POSH-RGUKT",
       html: `
-        <>
-          <h1>${otp}</h1>
-        </>
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POSH OTP Notification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="">
+      <h2 class="text-xl font-semibold text-center mb-3">
+        <span class="text-blue-900">POSH </span>OTP Verification
+      </h2>
+      <p class="text-sm text-gray-800 text-center mb-5">
+        Enter the following code in the POSH mobile app to verify your account
+        and start your actions:
+      </p>
+
+      <div
+        class="bg-blue-900 bg-opacity-15 text-gray-900 text-2xl font-mono font-bold text-center py-2 rounded mb-4"
+      >
+        ${otp}
+      </div>
+
+      <p class="text-xs text-gray-700 text-center mb-4">
+        This OTP will expire in 10 minutes.
+      </p>
+
+      <p class="text-xs text-gray-500 text-center mt-4">
+        Didn't request this? Ignore this notification.
+      </p>
+    </div>
+  </body>
+</html>
       `,
     };
 
@@ -462,9 +499,45 @@ export const postForgotPassword = async (req, res) => {
       to: email.split(",").map((email) => email.trim()),
       subject: "Password Verification of Girl Grievance",
       html: `
-        <>
-          <h1>${otp}</h1>
-        </>
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POSH OTP Notification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <div class="">
+      <h2 class="text-xl font-semibold text-center mb-3">
+        <span class="text-blue-900">POSH </span>OTP Verification
+      </h2>
+      <p class="text-sm text-gray-800 text-center mb-5">
+        Enter the following code in the POSH mobile app to verify your account
+        and start your actions:
+      </p>
+
+      <div
+        class="bg-blue-900 bg-opacity-15 text-gray-900 text-2xl font-mono font-bold text-center py-2 rounded mb-4"
+      >
+        ${otp}
+      </div>
+
+      <p class="text-xs text-gray-700 text-center mb-4">
+        This OTP will expire in 10 minutes.
+      </p>
+
+      <p class="text-xs text-gray-500 text-center mt-4">
+        Didn't request this? Ignore this notification.
+      </p>
+    </div>
+  </body>
+</html>
       `,
     };
 

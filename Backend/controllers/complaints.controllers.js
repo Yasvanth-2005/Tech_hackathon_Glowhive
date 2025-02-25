@@ -94,7 +94,7 @@ export const sendComplaint = async (req, res) => {
 
 export const updateComplaint = async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, admin_description } = req.body;
 
   try {
     const validStatuses = ["New", "Pending", "Rejected", "Solved"];
@@ -102,13 +102,50 @@ export const updateComplaint = async (req, res) => {
       return res.status(400).json({ message: "Invalid Status" });
     }
 
-    const complaint = await Complaints.findById(id);
+    const complaint = await Complaints.findByIdAndUpdate(
+      id,
+      {
+        admin_description,
+        status,
+      },
+      {
+        new: true,
+      }
+    ).populate("userId");
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }
 
-    complaint.status = status;
-    await complaint.save();
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "sivahere9484@gmail.com",
+        pass: process.env.PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: {
+        name: "Complaint Registered",
+        address: "sivahere9484@gmail.com",
+      },
+      to: complaint.userId.email,
+      subject: "Complaint Update of POSH",
+      html: `
+            <div>
+              <h2>Complaint Registered</h2>
+              <h3>Complaint Acknowledgment ID: ${complaint.acknowledgementId}</h3>
+              <div>
+                <h4>Complaint Return  Description : ${complaint.description}</h4>
+              </div>
+            </div>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
 
     return res
       .status(200)
@@ -166,7 +203,6 @@ export const getAllComplaints = async (req, res) => {
       },
     };
 
-    // Check if the role exists in any section
     let roleFound = false;
     let filters = [{ isCritical: true }];
 

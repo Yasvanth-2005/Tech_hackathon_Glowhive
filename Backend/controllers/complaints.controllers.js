@@ -119,17 +119,26 @@ export const updateComplaint = async (req, res) => {
       return res.status(400).json({ message: "Invalid Status" });
     }
 
-    const complaint = await Complaints.findByIdAndUpdate(
-      id,
-      {
-        admin_description,
-        status,
-        admin_role: role,
-      },
-      {
-        new: true,
-      }
-    ).populate("userId");
+    // Only require admin_description for statuses other than "Pending"
+    if (status !== "Pending" && !admin_description) {
+      return res
+        .status(400)
+        .json({ message: "Admin description is required for this status" });
+    }
+
+    const updateData = {
+      status,
+      admin_role: role,
+    };
+
+    // Only include admin_description if it's provided or status is not "Pending"
+    if (admin_description || status !== "Pending") {
+      updateData.admin_description = admin_description;
+    }
+
+    const complaint = await Complaints.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate("userId");
     if (!complaint) {
       return res.status(404).json({ message: "Complaint not found" });
     }
